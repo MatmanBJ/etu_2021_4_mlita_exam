@@ -1,6 +1,9 @@
 // Alternative exam -- 4 term
 // Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.03
+// Resolution method version alpha 0.04
+// Updates:
+// -- variable name is in the "ResolutionVariable" class now (code changed for that)
+// -- variable constructor, disjuncts output and functions changed
 
 package resolution;
 
@@ -11,7 +14,7 @@ public class ResolutionMethod
 {
 	public static void main(String[] args)
 	{
-		ResolutionVar a = new ResolutionVar('a');
+		/*ResolutionVar a = new ResolutionVar('a');
 		ResolutionVar b = new ResolutionVar('b');
 		
 		ResolutionVariable yesa = new ResolutionVariable();
@@ -45,46 +48,46 @@ public class ResolutionMethod
 		//f.GetFunction();
 		//F = f.Resolution();
 		//F.GetFunction();
-		f.GetFunction();
+		f.GetFunction();*/
 		
 		// new example
 		
-		ResolutionVar x = new ResolutionVar ('x');
+		/*ResolutionVar x = new ResolutionVar ('x');
 		ResolutionVar y = new ResolutionVar ('y');
 		ResolutionVar z = new ResolutionVar ('z');
 		ResolutionVar t = new ResolutionVar ('t');
-		ResolutionVar s = new ResolutionVar ('s');
+		ResolutionVar s = new ResolutionVar ('s');*/
 		
 		ArrayList<ResolutionVariable> variables = new ArrayList<ResolutionVariable>();
 		
-		variables.add(new ResolutionVariable(false, x));
-		variables.add(new ResolutionVariable(false, y));
-		variables.add(new ResolutionVariable(false, z));
+		variables.add(new ResolutionVariable(false, 'x'));
+		variables.add(new ResolutionVariable(false, 'y'));
+		variables.add(new ResolutionVariable(false, 'z'));
 		ResolutionDisjunct d_one = new ResolutionDisjunct(variables);
 		variables.removeAll(variables);
 		
-		variables.add(new ResolutionVariable(false, x));
-		variables.add(new ResolutionVariable(false, t));
-		variables.add(new ResolutionVariable(true, s));
+		variables.add(new ResolutionVariable(false, 'x'));
+		variables.add(new ResolutionVariable(false, 't'));
+		variables.add(new ResolutionVariable(true, 's'));
 		ResolutionDisjunct d_two = new ResolutionDisjunct(variables);
 		variables.removeAll(variables);
 		
-		variables.add(new ResolutionVariable(false, x));
-		variables.add(new ResolutionVariable(false, s));
+		variables.add(new ResolutionVariable(false, 'x'));
+		variables.add(new ResolutionVariable(false, 's'));
 		ResolutionDisjunct d_three = new ResolutionDisjunct(variables);
 		variables.removeAll(variables);
 		
-		variables.add(new ResolutionVariable(false, x));
-		variables.add(new ResolutionVariable(true, y));
-		variables.add(new ResolutionVariable(true, t));
+		variables.add(new ResolutionVariable(false, 'x'));
+		variables.add(new ResolutionVariable(true, 'y'));
+		variables.add(new ResolutionVariable(true, 't'));
 		ResolutionDisjunct d_four = new ResolutionDisjunct(variables);
 		variables.removeAll(variables);
 		
-		variables.add(new ResolutionVariable(true, x));
+		variables.add(new ResolutionVariable(true, 'x'));
 		ResolutionDisjunct d_five = new ResolutionDisjunct(variables);
 		variables.removeAll(variables);
 		
-		variables.add(new ResolutionVariable(true, z));
+		variables.add(new ResolutionVariable(true, 'z'));
 		ResolutionDisjunct d_six = new ResolutionDisjunct(variables);
 		variables.removeAll(variables);
 		

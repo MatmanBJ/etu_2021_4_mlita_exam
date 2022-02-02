@@ -7,7 +7,8 @@ public class ResolutionVariable
 	// -------------------------------
 	
 	private boolean denial; // if TRUE -- no denial, if FALSE -- inverse
-	private ResolutionVar var;
+	private char name;
+	//private ResolutionVar var;
 	
 	// -----------------------------
 	// ---------- METHODS ----------
@@ -18,10 +19,11 @@ public class ResolutionVariable
 	public ResolutionVariable () // default constructor
 	{}
 	
-	public ResolutionVariable (boolean localDenial, ResolutionVar localVar) // special constructor
+	public ResolutionVariable (boolean localDenial, char localName) // special constructor
 	{
 		denial = localDenial;
-		var = localVar;
+		name = localName;
+		//var = localVar;
 	}
 	
 	// ---------- SETTERS ----------
@@ -30,10 +32,14 @@ public class ResolutionVariable
 	{
 		denial = localDenial;
 	}
-	public void SetVar (ResolutionVar localVar)
+	public void SetName (char localName)
+	{
+		name = localName;
+	}
+	/*public void SetVar (ResolutionVar localVar)
 	{
 		var = localVar;
-	}
+	}*/
 	
 	// ---------- GETTERS ----------
 	
@@ -41,8 +47,12 @@ public class ResolutionVariable
 	{
 		return denial;
 	}
-	public ResolutionVar GetVar ()
+	public char GetName ()
+	{
+		return name;
+	}
+	/*public ResolutionVar GetVar ()
 	{
 		return var;
-	}
+	}*/
 }
