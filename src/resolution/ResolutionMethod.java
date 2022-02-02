@@ -1,6 +1,6 @@
 // Alternative exam -- 4 term
 // Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.04
+// Resolution method version alpha 0.05
 // Updates:
 // -- variable name is in the "ResolutionVariable" class now (code changed for that)
 // -- variable constructor, disjuncts output and functions changed
@@ -9,6 +9,8 @@ package resolution;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.HashSet;
 
 public class ResolutionMethod
 {

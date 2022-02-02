@@ -25,9 +25,12 @@ public class ResolutionFunction
 	{
 		int stop = 1;
 		Scanner localInputScanner = new Scanner(System.in);
+		System.out.println("---------- CONSOLE INPUT ----------");
+		System.out.println("Repeated and same disjuncts will be deleted!");
 		System.out.println("How many disjuncts do you want?");
 		String [] localInputString = new String[localInputScanner.nextInt()];
 		localInputScanner.nextLine();
+		System.out.println("Input them:");
 		for (int i = 0; i < localInputString.length; i++)
 		{
 			ArrayList<ResolutionVariable> localInputVariables = new ArrayList<ResolutionVariable>();
@@ -55,11 +58,14 @@ public class ResolutionFunction
 			}
 			ResolutionDisjunct localInputDisjunct = new ResolutionDisjunct(localInputVariables);
 			disjuncts.add(localInputDisjunct);
-			this.GetOneDisjunct();
+			this.GetOneDisjunct(i + 1);
 			
 			//System.out.println("New disjunct? 0 -- no, 1 -- yes:");
 
 		}
+		this.RefreshD();
+		this.SortD();
+		this.Refresh();
 		localInputScanner.close();
 	}
 	
@@ -79,11 +85,62 @@ public class ResolutionFunction
 	
 	// ---------- OTHERS ----------
 	
-	public void GetOneDisjunct () // for console-constructor
+	public void SortD ()
+	{
+		for (int i = 0; i < disjuncts.size(); i++)
+		{
+			disjuncts.get(i).Sort();
+		}
+	}
+	
+	public void RefreshD ()
+	{
+		for (int i = 0; i < disjuncts.size(); i++)
+		{
+			disjuncts.get(i).Refresh();
+		}
+	}
+	
+	public void Refresh()
+	{
+		for (int i = 0; i < disjuncts.size() - 1; i++)
+		{
+			for (int j = i + 1; j < disjuncts.size(); j++)
+			{
+				boolean ekwality = true;
+				if ((disjuncts.get(i).GetVariables().size() == disjuncts.get(j).GetVariables().size())
+						&& (disjuncts.get(i).GetOne() == disjuncts.get(j).GetOne())
+						&& (disjuncts.get(i).GetEmpty() == disjuncts.get(j).GetEmpty()))
+				{
+					for (int k = 0; k < disjuncts.get(i).GetVariables().size(); k++)
+					{
+						if ((disjuncts.get(i).GetVariables().get(k).GetName() !=
+								disjuncts.get(j).GetVariables().get(k).GetName()) ||
+								(disjuncts.get(i).GetVariables().get(k).GetDenial() !=
+								disjuncts.get(j).GetVariables().get(k).GetDenial()))
+						{
+							ekwality = false;
+						}
+					}
+				}
+				else
+				{
+					ekwality = false;
+				}
+				if (ekwality == true)
+				{
+					disjuncts.remove(j);
+					j = j - 1;
+				}
+			}
+		}
+	}
+	
+	public void GetOneDisjunct (int localI) // for console-constructor
 	{
 		ResolutionDisjunct localDisjunct = disjuncts.get(disjuncts.size() - 1);
 		ArrayList<ResolutionVariable> variables = localDisjunct.GetVariables();
-		System.out.print("Input: ");
+		System.out.print("Input " + localI + ": ");
 		if (localDisjunct.GetOne() == false && localDisjunct.GetEmpty() == false)
 		{
 			int j = 1;
@@ -124,6 +181,7 @@ public class ResolutionFunction
 		for (ResolutionDisjunct localDisjunct : disjuncts)
 		{
 			ArrayList<ResolutionVariable> variables = localDisjunct.GetVariables();
+			//System.out.print(localDisjunct.GetVariables().hashCode() + " ");
 			System.out.print(i + ": (" + localDisjunct.GetParents()[0] + ", " + localDisjunct.GetParents()[1] + ") ");
 			if (localDisjunct.GetOne() == false && localDisjunct.GetEmpty() == false)
 			{
@@ -201,41 +259,9 @@ public class ResolutionFunction
 							int [] localParents = {i + 1, j + 1};
 							localNewDisjunct.SetParents(localParents);
 							
-							for (int m = 0; m < localNewDisjunct.GetVariables().size() - 1; m++)
-							{
-								for (int n = m + 1; n < localNewDisjunct.GetVariables().size(); n++)
-								{
-									if ((localNewDisjunct.GetVariables().get(m).GetName() == 
-											localNewDisjunct.GetVariables().get(n).GetName()) && 
-											(localNewDisjunct.GetVariables().get(m).GetDenial() == 
-											localNewDisjunct.GetVariables().get(n).GetDenial()))
-									{
-										localNewDisjunct.GetVariables().remove(n);
-									}
-									else if ((localNewDisjunct.GetVariables().get(m).GetName() == 
-											localNewDisjunct.GetVariables().get(n).GetName()) && 
-											(localNewDisjunct.GetVariables().get(m).GetDenial() != 
-											localNewDisjunct.GetVariables().get(n).GetDenial()))
-									{
-										localNewDisjunct.GetVariables().removeAll(localNewDisjunct.GetVariables());
-										localNewDisjunct.SetOne(true);
-									}
-								}
-							}
-							if (localNewDisjunct.GetOne() == false && localNewDisjunct.GetVariables().size() == 0)
-							{
-								localNewDisjunct.SetEmpty(true);
-								/*if (regime.equals("find"))
-								{
-									repeat = false;
-									i = disjuncts.size() - 1;
-									j = disjuncts.size();
-									k = variables.size();
-									l = variablesTwo.size();
-									localF.SetDisjuncts(localNewDisjunct);
-									disjuncts.addAll(localF.GetDisjuncts());
-								}*/
-							}
+							localNewDisjunct.Refresh();
+							localNewDisjunct.Sort();
+							
 							localF.SetDisjuncts(localNewDisjunct);
 						}
 					}
@@ -286,31 +312,9 @@ public class ResolutionFunction
 								int [] localParents = {i + 1, j + 1};
 								localNewDisjunct.SetParents(localParents);
 								
-								for (int m = 0; m < localNewDisjunct.GetVariables().size() - 1; m++)
-								{
-									for (int n = m + 1; n < localNewDisjunct.GetVariables().size(); n++)
-									{
-										if ((localNewDisjunct.GetVariables().get(m).GetName() == 
-												localNewDisjunct.GetVariables().get(n).GetName()) && 
-												(localNewDisjunct.GetVariables().get(m).GetDenial() == 
-												localNewDisjunct.GetVariables().get(n).GetDenial()))
-										{
-											localNewDisjunct.GetVariables().remove(n);
-										}
-										else if ((localNewDisjunct.GetVariables().get(m).GetName() == 
-												localNewDisjunct.GetVariables().get(n).GetName()) && 
-												(localNewDisjunct.GetVariables().get(m).GetDenial() != 
-												localNewDisjunct.GetVariables().get(n).GetDenial()))
-										{
-											localNewDisjunct.GetVariables().removeAll(localNewDisjunct.GetVariables());
-											localNewDisjunct.SetOne(true);
-										}
-									}
-								}
-								if (localNewDisjunct.GetOne() == false && localNewDisjunct.GetVariables().size() == 0)
-								{
-									localNewDisjunct.SetEmpty(true);
-								}
+								localNewDisjunct.Refresh();
+								localNewDisjunct.Sort();
+								
 								localFR.SetDisjuncts(localNewDisjunct);
 							}
 						}
@@ -382,27 +386,9 @@ public class ResolutionFunction
 							int [] localParents = {i + 1, j + 1};
 							localNewDisjunct.SetParents(localParents);
 							
-							for (int m = 0; m < localNewDisjunct.GetVariables().size() - 1; m++)
-							{
-								for (int n = m + 1; n < localNewDisjunct.GetVariables().size(); n++)
-								{
-									if ((localNewDisjunct.GetVariables().get(m).GetName() == 
-											localNewDisjunct.GetVariables().get(n).GetName()) && 
-											(localNewDisjunct.GetVariables().get(m).GetDenial() == 
-											localNewDisjunct.GetVariables().get(n).GetDenial()))
-									{
-										localNewDisjunct.GetVariables().remove(n);
-									}
-									else if ((localNewDisjunct.GetVariables().get(m).GetName() == 
-											localNewDisjunct.GetVariables().get(n).GetName()) && 
-											(localNewDisjunct.GetVariables().get(m).GetDenial() != 
-											localNewDisjunct.GetVariables().get(n).GetDenial()))
-									{
-										localNewDisjunct.GetVariables().removeAll(localNewDisjunct.GetVariables());
-										localNewDisjunct.SetOne(true);
-									}
-								}
-							}
+							localNewDisjunct.Refresh();
+							localNewDisjunct.Sort();
+							
 							if (localNewDisjunct.GetOne() == false && localNewDisjunct.GetVariables().size() == 0)
 							{
 								localNewDisjunct.SetEmpty(true);
@@ -479,27 +465,9 @@ public class ResolutionFunction
 								int [] localParents = {i + 1, j + 1};
 								localNewDisjunct.SetParents(localParents);
 								
-								for (int m = 0; m < localNewDisjunct.GetVariables().size() - 1; m++)
-								{
-									for (int n = m + 1; n < localNewDisjunct.GetVariables().size(); n++)
-									{
-										if ((localNewDisjunct.GetVariables().get(m).GetName() == 
-												localNewDisjunct.GetVariables().get(n).GetName()) && 
-												(localNewDisjunct.GetVariables().get(m).GetDenial() == 
-												localNewDisjunct.GetVariables().get(n).GetDenial()))
-										{
-											localNewDisjunct.GetVariables().remove(n);
-										}
-										else if ((localNewDisjunct.GetVariables().get(m).GetName() == 
-												localNewDisjunct.GetVariables().get(n).GetName()) && 
-												(localNewDisjunct.GetVariables().get(m).GetDenial() != 
-												localNewDisjunct.GetVariables().get(n).GetDenial()))
-										{
-											localNewDisjunct.GetVariables().removeAll(localNewDisjunct.GetVariables());
-											localNewDisjunct.SetOne(true);
-										}
-									}
-								}
+								localNewDisjunct.Refresh();
+								localNewDisjunct.Sort();
+								
 								if (localNewDisjunct.GetOne() == false && localNewDisjunct.GetVariables().size() == 0)
 								{
 									localNewDisjunct.SetEmpty(true);
@@ -534,6 +502,9 @@ public class ResolutionFunction
 		int c;
 		boolean repeat = true;
 		ResolutionFunction localF = new ResolutionFunction();
+		this.RefreshD();
+		this.SortD();
+		this.Refresh();
 		for (i = 0; i < disjuncts.size() - 1; i++)
 		{
 			ResolutionDisjunct localDisjunct = disjuncts.get(i);
@@ -565,41 +536,9 @@ public class ResolutionFunction
 							int [] localParents = {i + 1, j + 1};
 							localNewDisjunct.SetParents(localParents);
 							
-							for (int m = 0; m < localNewDisjunct.GetVariables().size() - 1; m++)
-							{
-								for (int n = m + 1; n < localNewDisjunct.GetVariables().size(); n++)
-								{
-									if ((localNewDisjunct.GetVariables().get(m).GetName() == 
-											localNewDisjunct.GetVariables().get(n).GetName()) && 
-											(localNewDisjunct.GetVariables().get(m).GetDenial() == 
-											localNewDisjunct.GetVariables().get(n).GetDenial()))
-									{
-										localNewDisjunct.GetVariables().remove(n);
-									}
-									else if ((localNewDisjunct.GetVariables().get(m).GetName() == 
-											localNewDisjunct.GetVariables().get(n).GetName()) && 
-											(localNewDisjunct.GetVariables().get(m).GetDenial() != 
-											localNewDisjunct.GetVariables().get(n).GetDenial()))
-									{
-										localNewDisjunct.GetVariables().removeAll(localNewDisjunct.GetVariables());
-										localNewDisjunct.SetOne(true);
-									}
-								}
-							}
-							if (localNewDisjunct.GetOne() == false && localNewDisjunct.GetVariables().size() == 0)
-							{
-								localNewDisjunct.SetEmpty(true);
-								/*if (regime.equals("find"))
-								{
-									repeat = false;
-									i = disjuncts.size() - 1;
-									j = disjuncts.size();
-									k = variables.size();
-									l = variablesTwo.size();
-									localF.SetDisjuncts(localNewDisjunct);
-									disjuncts.addAll(localF.GetDisjuncts());
-								}*/
-							}
+							localNewDisjunct.Refresh();
+							localNewDisjunct.Sort();
+							
 							localF.SetDisjuncts(localNewDisjunct);
 						}
 					}
@@ -608,56 +547,13 @@ public class ResolutionFunction
 		}
 		while (repeat == true)
 		{
-			/*for (i = 0; i < disjuncts.size() - 1; i++)
-			{
-				for (j = i + 1; j < disjuncts.size(); j++)
-				{
-					if (disjuncts.get(i).GetVariables().hashCode() == disjuncts.get(j).GetVariables().hashCode() ||
-							(disjuncts.get(i).GetVariables().size() == 0 &&
-							disjuncts.get(j).GetVariables().size() == 0))
-					{
-						disjuncts.remove(j);
-					}
-				}
-			}
-			for (i = 0; i < disjuncts.size() - 1; i++)
-			{
-				for (j = i + 1; j < disjuncts.size(); j++)
-				{
-					if (disjuncts.get(i).GetVariables().hashCode() == disjuncts.get(j).GetVariables().hashCode())
-					{
-						disjuncts.remove(j);
-						j = j - 1;
-					}
-				}
-			}*/
-			for (i = 0; i < disjuncts.size(); i++)
-			{
-				for (j = 0; j < localF.GetDisjuncts().size(); j++)
-				{
-					if (disjuncts.get(i).GetVariables().hashCode() ==
-							localF.GetDisjuncts().get(j).GetVariables().hashCode())
-					{
-						localF.GetDisjuncts().remove(j);
-						j = j - 1;
-					}
-				}
-			}
-			for (i = 0; i < localF.GetDisjuncts().size() - 1; i++)
-			{
-				for (j = i + 1; j < localF.GetDisjuncts().size(); j++)
-				{
-					if (localF.GetDisjuncts().get(i).GetVariables().hashCode() ==
-							localF.GetDisjuncts().get(j).GetVariables().hashCode())
-					{
-						localF.GetDisjuncts().remove(j);
-						j = j - 1;
-					}
-				}
-			}
 			ResolutionFunction localFR = new ResolutionFunction();
 			int d = disjuncts.size();
+			localF.SortD(); // the order is important
+			localF.Refresh();
 			disjuncts.addAll(localF.GetDisjuncts());
+			this.SortD(); // the order is important
+			this.Refresh(); // it's only here, because at the end it doesn't work
 			for (i = 0; i < disjuncts.size() - 1; i++)
 			{
 				ResolutionDisjunct localDisjunct = disjuncts.get(i);
@@ -697,31 +593,9 @@ public class ResolutionFunction
 								int [] localParents = {i + 1, j + 1};
 								localNewDisjunct.SetParents(localParents);
 								
-								for (int m = 0; m < localNewDisjunct.GetVariables().size() - 1; m++)
-								{
-									for (int n = m + 1; n < localNewDisjunct.GetVariables().size(); n++)
-									{
-										if ((localNewDisjunct.GetVariables().get(m).GetName() == 
-												localNewDisjunct.GetVariables().get(n).GetName()) && 
-												(localNewDisjunct.GetVariables().get(m).GetDenial() == 
-												localNewDisjunct.GetVariables().get(n).GetDenial()))
-										{
-											localNewDisjunct.GetVariables().remove(n);
-										}
-										else if ((localNewDisjunct.GetVariables().get(m).GetName() == 
-												localNewDisjunct.GetVariables().get(n).GetName()) && 
-												(localNewDisjunct.GetVariables().get(m).GetDenial() != 
-												localNewDisjunct.GetVariables().get(n).GetDenial()))
-										{
-											localNewDisjunct.GetVariables().removeAll(localNewDisjunct.GetVariables());
-											localNewDisjunct.SetOne(true);
-										}
-									}
-								}
-								if (localNewDisjunct.GetOne() == false && localNewDisjunct.GetVariables().size() == 0)
-								{
-									localNewDisjunct.SetEmpty(true);
-								}
+								localNewDisjunct.Refresh();
+								localNewDisjunct.Sort();
+								
 								localFR.SetDisjuncts(localNewDisjunct);
 							}
 						}
@@ -734,16 +608,5 @@ public class ResolutionFunction
 			}
 			localF = localFR;
 		}
-		/*for (i = 0; i < disjuncts.size() - 1; i++)
-		{
-			for (j = i + 1; j < disjuncts.size(); j++)
-			{
-				if (disjuncts.get(i).GetVariables().hashCode() == disjuncts.get(j).GetVariables().hashCode())
-				{
-					disjuncts.remove(j);
-					j = j - 1;
-				}
-			}
-		}*/
 	}
 }
