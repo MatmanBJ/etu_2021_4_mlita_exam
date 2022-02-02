@@ -74,4 +74,7 @@ public class ResolutionDisjunct
 	{
 		return variables;
 	}
+	
+	// ---------- OTHERS ----------
+	
 }

@@ -1,10 +1,11 @@
 // Alternative exam -- 4 term
 // Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.02
+// Resolution method version alpha 0.03
 
 package resolution;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class ResolutionMethod
 {
@@ -41,9 +42,10 @@ public class ResolutionMethod
 		f.SetDisjuncts(one);
 		f.SetDisjuncts(two);
 		
+		//f.GetFunction();
+		//F = f.Resolution();
+		//F.GetFunction();
 		f.GetFunction();
-		F = f.Resolution("find");
-		F.GetFunction();
 		
 		// new example
 		
@@ -94,8 +96,14 @@ public class ResolutionMethod
 		d_func.SetDisjuncts(d_five);
 		d_func.SetDisjuncts(d_six);
 		
-		ResolutionFunction d_func_return = d_func.Resolution("find");
+		d_func.ResolutionHash();
+		//d_func.ResolutionFind();
+		//d_func.Resolution();
 		d_func.GetFunction();
 		//d_func_return.GetFunction();
+		
+		ResolutionFunction cons = new ResolutionFunction("INPUT");
+		cons.ResolutionHash();
+		cons.GetFunction();
 	}
 }
