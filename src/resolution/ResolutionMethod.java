@@ -1,4 +1,10 @@
+// Alternative exam -- 4 term
+// Matthew Sobolewski and Victor Stepovik
+// Resolution method version alpha 0.02
+
 package resolution;
+
+import java.util.ArrayList;
 
 public class ResolutionMethod
 {
@@ -36,7 +42,60 @@ public class ResolutionMethod
 		f.SetDisjuncts(two);
 		
 		f.GetFunction();
-		F = f.Resolution();
+		F = f.Resolution("find");
 		F.GetFunction();
+		
+		// new example
+		
+		ResolutionVar x = new ResolutionVar ('x');
+		ResolutionVar y = new ResolutionVar ('y');
+		ResolutionVar z = new ResolutionVar ('z');
+		ResolutionVar t = new ResolutionVar ('t');
+		ResolutionVar s = new ResolutionVar ('s');
+		
+		ArrayList<ResolutionVariable> variables = new ArrayList<ResolutionVariable>();
+		
+		variables.add(new ResolutionVariable(false, x));
+		variables.add(new ResolutionVariable(false, y));
+		variables.add(new ResolutionVariable(false, z));
+		ResolutionDisjunct d_one = new ResolutionDisjunct(variables);
+		variables.removeAll(variables);
+		
+		variables.add(new ResolutionVariable(false, x));
+		variables.add(new ResolutionVariable(false, t));
+		variables.add(new ResolutionVariable(true, s));
+		ResolutionDisjunct d_two = new ResolutionDisjunct(variables);
+		variables.removeAll(variables);
+		
+		variables.add(new ResolutionVariable(false, x));
+		variables.add(new ResolutionVariable(false, s));
+		ResolutionDisjunct d_three = new ResolutionDisjunct(variables);
+		variables.removeAll(variables);
+		
+		variables.add(new ResolutionVariable(false, x));
+		variables.add(new ResolutionVariable(true, y));
+		variables.add(new ResolutionVariable(true, t));
+		ResolutionDisjunct d_four = new ResolutionDisjunct(variables);
+		variables.removeAll(variables);
+		
+		variables.add(new ResolutionVariable(true, x));
+		ResolutionDisjunct d_five = new ResolutionDisjunct(variables);
+		variables.removeAll(variables);
+		
+		variables.add(new ResolutionVariable(true, z));
+		ResolutionDisjunct d_six = new ResolutionDisjunct(variables);
+		variables.removeAll(variables);
+		
+		ResolutionFunction d_func = new ResolutionFunction();
+		d_func.SetDisjuncts(d_one);
+		d_func.SetDisjuncts(d_two);
+		d_func.SetDisjuncts(d_three);
+		d_func.SetDisjuncts(d_four);
+		d_func.SetDisjuncts(d_five);
+		d_func.SetDisjuncts(d_six);
+		
+		ResolutionFunction d_func_return = d_func.Resolution("find");
+		d_func.GetFunction();
+		//d_func_return.GetFunction();
 	}
 }

@@ -13,6 +13,17 @@ public class ResolutionVariable
 	// ---------- METHODS ----------
 	// -----------------------------
 	
+	// ---------- CONSTRUCTORS ----------
+	
+	public ResolutionVariable () // default constructor
+	{}
+	
+	public ResolutionVariable (boolean localDenial, ResolutionVar localVar) // special constructor
+	{
+		denial = localDenial;
+		var = localVar;
+	}
+	
 	// ---------- SETTERS ----------
 	
 	public void SetDenial (boolean localDenial)
