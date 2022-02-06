@@ -1,8 +1,9 @@
 // Alternative exam -- 4 term
 // Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.12
+// Resolution method version alpha 0.13
 // Updates:
-// -- Input function updated again
+// -- Class "ResolutionVariable" now consist string-name (it allows vars like x1, x2, etc instead of only x, y, etc)
+// -- First resolution strategy added, new in developing
 
 package resolution;
 
@@ -59,38 +60,38 @@ public class ResolutionMethod
 		ResolutionVar t = new ResolutionVar ('t');
 		ResolutionVar s = new ResolutionVar ('s');*/
 	}
-	public static void ExampleTwo()
+	public static void ExampleTwo ()
 	{
 		ArrayList<ResolutionVariable> variables = new ArrayList<ResolutionVariable>();
 		
-		variables.add(new ResolutionVariable(false, 'x'));
-		variables.add(new ResolutionVariable(false, 'y'));
-		variables.add(new ResolutionVariable(false, 'z'));
+		variables.add(new ResolutionVariable(false, "x"));
+		variables.add(new ResolutionVariable(false, "y"));
+		variables.add(new ResolutionVariable(false, "z"));
 		ResolutionDisjunct d_one = new ResolutionDisjunct(variables);
 		variables.removeAll(variables);
 		
-		variables.add(new ResolutionVariable(false, 'x'));
-		variables.add(new ResolutionVariable(false, 't'));
-		variables.add(new ResolutionVariable(true, 's'));
+		variables.add(new ResolutionVariable(false, "x"));
+		variables.add(new ResolutionVariable(false, "t"));
+		variables.add(new ResolutionVariable(true, "s"));
 		ResolutionDisjunct d_two = new ResolutionDisjunct(variables);
 		variables.removeAll(variables);
 		
-		variables.add(new ResolutionVariable(false, 'x'));
-		variables.add(new ResolutionVariable(false, 's'));
+		variables.add(new ResolutionVariable(false, "x"));
+		variables.add(new ResolutionVariable(false, "s"));
 		ResolutionDisjunct d_three = new ResolutionDisjunct(variables);
 		variables.removeAll(variables);
 		
-		variables.add(new ResolutionVariable(false, 'x'));
-		variables.add(new ResolutionVariable(true, 'y'));
-		variables.add(new ResolutionVariable(true, 't'));
+		variables.add(new ResolutionVariable(false, "x"));
+		variables.add(new ResolutionVariable(true, "y"));
+		variables.add(new ResolutionVariable(true, "t"));
 		ResolutionDisjunct d_four = new ResolutionDisjunct(variables);
 		variables.removeAll(variables);
 		
-		variables.add(new ResolutionVariable(true, 'x'));
+		variables.add(new ResolutionVariable(true, "x"));
 		ResolutionDisjunct d_five = new ResolutionDisjunct(variables);
 		variables.removeAll(variables);
 		
-		variables.add(new ResolutionVariable(true, 'z'));
+		variables.add(new ResolutionVariable(true, "z"));
 		ResolutionDisjunct d_six = new ResolutionDisjunct(variables);
 		variables.removeAll(variables);
 		
@@ -108,7 +109,23 @@ public class ResolutionMethod
 		d_func.GetFunction();
 		//d_func_return.GetFunction();
 	}
-	public static ResolutionFunction InputMain(String localType)
+	public static void StrategiesDemonstration () // resolution strategy demonstrations
+	{
+		// I STOPPED HERE
+		ResolutionFunction localStrategy;
+		System.out.println("---------- SATURATION STRATEGY ----------");
+		localStrategy = new ResolutionFunction ();
+		localStrategy.ResolutionFileInput("example_theory.txt");
+		localStrategy.ResolutionSaturation();
+		localStrategy.GetFunction();
+		System.out.println("---------- STRIKEOUT STRATEGY ----------");
+		localStrategy = new ResolutionFunction ();
+		localStrategy.ResolutionFileInput("example_theory.txt");
+		localStrategy.ResolutionStrikeout();
+		localStrategy.GetFunction();
+		//System.out.println("---------- ??? STRATEGY ----------");
+	}
+	public static ResolutionFunction InputMain (String localType)
 	{
 		ResolutionFunction cons = new ResolutionFunction ();
 		if (localType.equals("console"))
@@ -206,6 +223,7 @@ public class ResolutionMethod
 	public static void main(String[] args)
 	{
 		ExampleTwo();
+		StrategiesDemonstration();
 		
 		Scanner inputScanner = new Scanner(System.in);
 		int key = 1;

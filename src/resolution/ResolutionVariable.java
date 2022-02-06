@@ -7,7 +7,7 @@ public class ResolutionVariable
 	// -------------------------------
 	
 	private boolean denial; // if TRUE -- no denial, if FALSE -- inverse
-	private char name;
+	private String name;
 	//private ResolutionVar var;
 	
 	// -----------------------------
@@ -19,7 +19,7 @@ public class ResolutionVariable
 	public ResolutionVariable () // default constructor
 	{}
 	
-	public ResolutionVariable (boolean localDenial, char localName) // special constructor
+	public ResolutionVariable (boolean localDenial, String localName) // special constructor
 	{
 		denial = localDenial;
 		name = localName;
@@ -32,7 +32,7 @@ public class ResolutionVariable
 	{
 		denial = localDenial;
 	}
-	public void SetName (char localName)
+	public void SetName (String localName)
 	{
 		name = localName;
 	}
@@ -47,7 +47,7 @@ public class ResolutionVariable
 	{
 		return denial;
 	}
-	public char GetName ()
+	public String GetName ()
 	{
 		return name;
 	}

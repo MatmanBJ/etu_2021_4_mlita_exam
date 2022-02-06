@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Comparator;
 
 public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 {
@@ -93,7 +94,14 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 	
 	public void Sort () // sorting elements in alphabet order
 	{
-		for (int i = 0; i < variables.size() - 1; i++)
+		Collections.sort(variables, new Comparator<ResolutionVariable>()
+		{
+		    public int compare(ResolutionVariable v1, ResolutionVariable v2)
+		    {
+		        return v1.GetName().compareTo(v2.GetName());
+		    }
+		});
+		/*for (int i = 0; i < variables.size() - 1; i++)
 		{
 			for (int j = i + 1; j < variables.size(); j++)
 			{
@@ -102,7 +110,7 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 					Collections.swap(variables, i, j);
 				}
 			}
-		}
+		}*/
 	}
 	
 	public void Refresh () // delete duplicate elements
@@ -111,13 +119,13 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		{
 			for (int j = i + 1; j < variables.size(); j++)
 			{
-				if ((variables.get(i).GetName() == variables.get(j).GetName())
+				if ((variables.get(i).GetName().equals(variables.get(j).GetName()))
 						&& variables.get(i).GetDenial() == variables.get(j).GetDenial())
 				{
 					variables.remove(j);
 					j = j - 1;
 				}
-				else if ((variables.get(i).GetName() == variables.get(j).GetName())
+				else if ((variables.get(i).GetName().equals(variables.get(j).GetName()))
 						&& (variables.get(i).GetDenial() != variables.get(j).GetDenial()))
 				{
 					variables.removeAll(variables);
