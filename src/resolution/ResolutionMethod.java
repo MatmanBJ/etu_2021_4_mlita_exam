@@ -1,8 +1,12 @@
 // Alternative exam -- 4 term
 // Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.14
+// Resolution method version alpha 0.15
 // Updates:
-// -- Strikeout resolution strategy added
+// -- Preference strategy added
+// -- Disjunct's ID added
+// -- Parent's numbers replaced by disjunct's ID
+// -- Output with ID instead of just number (ID connected with creating)
+// -- Good treatment menu added (and demonstration made from this menu)
 
 package resolution;
 
@@ -113,16 +117,63 @@ public class ResolutionMethod
 		// I STOPPED HERE
 		ResolutionFunction localStrategy;
 		System.out.println("---------- SATURATION STRATEGY ----------");
+		ResolutionDisjunct.SetMaxID();
 		localStrategy = new ResolutionFunction ();
 		localStrategy.ResolutionFileInput("example_theory.txt");
 		localStrategy.ResolutionSaturation();
 		localStrategy.GetFunction();
+		System.out.println("---------- PREFERENCE STRATEGY ----------");
+		ResolutionDisjunct.SetMaxID();
+		localStrategy = new ResolutionFunction ();
+		localStrategy.ResolutionFileInput("example_theory.txt");
+		localStrategy.ResolutionPreference();
+		localStrategy.GetFunction();
 		System.out.println("---------- STRIKEOUT STRATEGY ----------");
+		ResolutionDisjunct.SetMaxID();
 		localStrategy = new ResolutionFunction ();
 		localStrategy.ResolutionFileInput("example_theory.txt");
 		localStrategy.ResolutionStrikeout();
 		localStrategy.GetFunction();
-		//System.out.println("---------- ??? STRATEGY ----------");
+	}
+	public static ResolutionFunction TreatmentMain (String localString, ResolutionFunction localRF)
+	{
+		if (localString.equals("saturation"))
+		{
+			localRF.ResolutionSaturation();
+		}
+		else if (localString.equals("preference"))
+		{
+			localRF.ResolutionPreference();
+		}
+		else if (localString.equals("strikeout"))
+		{
+			localRF.ResolutionStrikeout();
+		}
+		else if (localString.equals("strategies demonstration"))
+		{
+			StrategiesDemonstration();
+		}
+		else if (localString.equals("resolution")) // technical, not for common usage
+		{
+			localRF.Resolution();
+		}
+		else if (localString.equals("find")) // technical, not for common usage
+		{
+			localRF.ResolutionFind();
+		}
+		else if (localString.equals("hash")) // technical, not for common usage
+		{
+			localRF.ResolutionHash();
+		}
+		else if (localString.equals("unique")) // technical, not for common usage
+		{
+			localRF.ResolutionAllUnique();
+		}
+		else
+		{
+			System.out.println("Incorrect type of treatment! Nothing is done with function");
+		}
+		return localRF;
 	}
 	public static ResolutionFunction InputMain (String localType)
 	{
@@ -221,8 +272,8 @@ public class ResolutionMethod
 	}
 	public static void main(String[] args)
 	{
-		ExampleTwo();
-		StrategiesDemonstration();
+		//ExampleTwo();
+		//StrategiesDemonstration();
 		
 		Scanner inputScanner = new Scanner(System.in);
 		int key = 1;
@@ -233,6 +284,8 @@ public class ResolutionMethod
 		
 		while (key != 0)
 		{
+			ResolutionDisjunct.SetMaxID();
+			
 			System.out.println("Please write type of input (<type>):");
 			typeInput = inputScanner.nextLine();
 			System.out.println("Please write type of treatment (<type>):");
@@ -241,8 +294,9 @@ public class ResolutionMethod
 			typeOutput = inputScanner.nextLine();
 			
 			localFunction = InputMain(typeInput);
+			localFunction = TreatmentMain(typeTreatment, localFunction);
 			//localFunction.ResolutionHash();
-			localFunction.ResolutionAllUnique();
+			//localFunction.ResolutionAllUnique();
 			OutputMain(localFunction, typeOutput);
 			
 			System.out.println("Do you want to input something else? Press 0 to NO, press else to YES:");

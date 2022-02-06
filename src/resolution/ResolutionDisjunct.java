@@ -14,6 +14,8 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 	
 	private boolean one; // if TRUE -- disjunct = 1
 	private boolean empty; // if TRUE -- disjunct = empty (0)
+	private static int maxID = 0;
+	private int id;
 	private int [] parents = new int [2];
 	private String contrary; // the contrary variable of parents
 	private ArrayList<ResolutionVariable> variables = new ArrayList<ResolutionVariable>();
@@ -28,6 +30,8 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 	{
 		one = false;
 		empty = false;
+		id = maxID + 1;
+		maxID = maxID + 1;
 		parents[0] = 0;
 		parents[1] = 0;
 		contrary = "0";
@@ -38,6 +42,8 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		one = false;
 		empty = false;
 		variables.addAll(localResolutionVariable);
+		id = maxID + 1;
+		maxID = maxID + 1;
 		parents[0] = 0;
 		parents[1] = 0;
 		contrary = "0";
@@ -52,6 +58,10 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 	public void SetEmpty (boolean localEmpty)
 	{
 		empty = localEmpty;
+	}
+	public static void SetMaxID ()
+	{
+		maxID = 0;
 	}
 	public void SetParents (int [] localParents)
 	{
@@ -76,6 +86,14 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 	public boolean GetEmpty ()
 	{
 		return empty;
+	}
+	public int GetMaxID ()
+	{
+		return maxID;
+	}
+	public int GetID ()
+	{
+		return id;
 	}
 	public int [] GetParents ()
 	{
