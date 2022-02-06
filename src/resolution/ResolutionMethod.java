@@ -1,12 +1,8 @@
 // Alternative exam -- 4 term
 // Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.15
+// Resolution method version alpha 0.16
 // Updates:
-// -- Preference strategy added
-// -- Disjunct's ID added
-// -- Parent's numbers replaced by disjunct's ID
-// -- Output with ID instead of just number (ID connected with creating)
-// -- Good treatment menu added (and demonstration made from this menu)
+// -- Demonstration methods algorithm fixed
 
 package resolution;
 
@@ -112,7 +108,7 @@ public class ResolutionMethod
 		d_func.GetFunction();
 		//d_func_return.GetFunction();
 	}
-	public static void StrategiesDemonstration () // resolution strategy demonstrations
+	public static void StrategiesDemonstration (ResolutionFunction localLocalRF) // resolution strategy demonstrations
 	{
 		// I STOPPED HERE
 		ResolutionFunction localStrategy;
@@ -151,7 +147,7 @@ public class ResolutionMethod
 		}
 		else if (localString.equals("strategies demonstration"))
 		{
-			StrategiesDemonstration();
+			StrategiesDemonstration(localRF);
 		}
 		else if (localString.equals("resolution")) // technical, not for common usage
 		{

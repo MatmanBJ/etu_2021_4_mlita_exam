@@ -1176,6 +1176,7 @@ public class ResolutionFunction
 		boolean repeat = true; // repeating indicator
 		boolean adding = false; // adding disjuncts in the end indicator
 		ResolutionFunction localF = new ResolutionFunction();
+		ResolutionFunction localClassicRF = new ResolutionFunction();
 		localF.GetDisjuncts().addAll(disjuncts);
 		disjuncts.removeAll(disjuncts);
 		//this.RefreshD();
@@ -1187,7 +1188,9 @@ public class ResolutionFunction
 			int d = disjuncts.size();
 			localF.SortD(); // the order is important
 			localF.RefreshSize();
+			localClassicRF.GetDisjuncts().addAll(localF.GetDisjuncts());
 			//localF.Refresh();
+			this.RefreshSize();
 			disjuncts.addAll(localF.GetDisjuncts());
 			this.SortD(); // the order is important
 			//this.Refresh(); // it's only here, because at the end it doesn't work
@@ -1262,7 +1265,10 @@ public class ResolutionFunction
 					//System.out.println(localF.GetDisjuncts().size());
 				}
 				localF.RefreshSize();
+				localClassicRF.GetDisjuncts().addAll(localF.GetDisjuncts());
 				disjuncts.addAll(localF.GetDisjuncts());
+				disjuncts.removeAll(disjuncts);
+				disjuncts.addAll(localClassicRF.GetDisjuncts());
 			}
 		}
 	}
