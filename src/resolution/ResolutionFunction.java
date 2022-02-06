@@ -3,6 +3,7 @@ package resolution;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
+import java.io.*;
 
 public class ResolutionFunction
 {
@@ -217,6 +218,100 @@ public class ResolutionFunction
 			i = i + 1;
 			System.out.print("\n");
 		}
+	}
+	
+	public void ResolutionFileExample ()
+	{
+		try (FileWriter writer = new FileWriter("notes3.txt", false))
+        {
+           // запись всей строки
+            String text = "Hello Gold!";
+            writer.write(text);
+            // запись по символам
+            writer.append('\n');
+            writer.append('E');
+             
+            writer.flush();
+        }
+        catch(IOException localException)
+		{
+            System.out.println(localException.getMessage());
+        }
+	}
+	
+	public void ResolutionFileReadeble ()
+	{
+		try (FileWriter writer = new FileWriter("RFR.txt", false))
+        {
+			int i = 1;
+			ArrayList<String> localOutput = new ArrayList<String>();
+			String localOut [] = new String[this.GetDisjuncts().size()];
+			for (ResolutionDisjunct localDisjunct : disjuncts)
+			{
+				ArrayList<ResolutionVariable> variables = localDisjunct.GetVariables();
+				localOut[i - 1] = "\u0000";
+				localOutput.add("\u0000");
+				//System.out.print(localDisjunct.GetVariables().hashCode() + " ");
+				System.out.print(i + ": (" + localDisjunct.GetParents()[0] + ", " + localDisjunct.GetParents()[1] + ") ");
+				if (localDisjunct.GetOne() == false && localDisjunct.GetEmpty() == false)
+				{
+					int j = 1;
+					for (ResolutionVariable localVariable : variables)
+					{
+						//ResolutionVar var = localVariable.GetVar();
+						char inverse;
+						if (localVariable.GetDenial() == true)
+						{
+							inverse = '\u0000';
+						}
+						else
+						{
+							inverse = '!';
+						}
+						//localOutput.add(localOutput.get(i - 1) + inverse + "\u0000" + localVariable.GetName());
+						localOut[i - 1] = localOut[i - 1] + inverse + "\u0000" + localVariable.GetName();
+						localOutput.add(i - 1, localOutput.get(i - 1) + inverse + "\u0000" + localVariable.GetName());
+						//System.out.print(inverse + "\u0000" + localVariable.GetName());
+						if (j < localDisjunct.GetVariables().size())
+						{
+							localOut[i - 1] = localOut[i - 1] + " v ";
+							localOutput.add(i - 1, localOutput.get(i - 1) + " v ");
+							//System.out.print(" v ");
+						}
+						j = j + 1;
+					}
+					System.out.println(localOut[i - 1]);
+				}
+				else if (localDisjunct.GetOne() == true)
+				{
+					localOut[i - 1] = "1 (~ true)";
+					System.out.print(localOut[i - 1]);
+				}
+				else if (localDisjunct.GetEmpty() == true)
+				{
+					localOut[i - 1] = "□ (~ false)";
+					System.out.print(localOut[i - 1]);
+				}
+				i = i + 1;
+				System.out.print("\n");
+			}
+            // запись всей строки
+			i = 1;
+			for (ResolutionDisjunct localDisjunct : disjuncts)
+			{
+				String localString = localOut[i - 1];
+				//String localString = localOutput.get(i - 1);
+				writer.write(localString);
+				writer.append('\n');
+				i = i + 1;
+			}
+             
+            writer.flush();
+        }
+        catch(IOException localException)
+		{
+            System.out.println(localException.getMessage());
+        }
 	}
 	
 	public ResolutionFunction Resolution ()

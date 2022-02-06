@@ -1,10 +1,8 @@
 // Alternative exam -- 4 term
 // Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.06
+// Resolution method version alpha 0.07
 // Updates:
-// -- Scanner error with close I/O system fixed
-// -- console input and solving are in while loop now
-// -- console input and example are in main class' methods now
+// -- File output added
 
 package resolution;
 
@@ -115,6 +113,8 @@ public class ResolutionMethod
 		ResolutionFunction cons = new ResolutionFunction("INPUT");
 		cons.ResolutionHash();
 		cons.GetFunction();
+		cons.ResolutionFileExample();
+		cons.ResolutionFileReadeble();
 	}
 	public static void main(String[] args)
 	{
