@@ -1,9 +1,8 @@
 // Alternative exam -- 4 term
 // Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.13
+// Resolution method version alpha 0.14
 // Updates:
-// -- Class "ResolutionVariable" now consist string-name (it allows vars like x1, x2, etc instead of only x, y, etc)
-// -- First resolution strategy added, new in developing
+// -- Strikeout resolution strategy added
 
 package resolution;
 

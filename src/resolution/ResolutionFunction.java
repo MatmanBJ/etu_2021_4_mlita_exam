@@ -106,6 +106,66 @@ public class ResolutionFunction
 		}
 	}
 	
+	public void RefreshExtension(int localSize)
+	{
+		for (int i = 0; i < localSize; i++)
+		{
+			for (int j = localSize; j < disjuncts.size(); j++)
+			{
+				boolean ekwality = true;
+				if ((disjuncts.get(i).GetOne() == disjuncts.get(j).GetOne())
+						&& (disjuncts.get(i).GetEmpty() == disjuncts.get(j).GetEmpty()))
+				{
+					int localMaxSize = 0;
+					if (disjuncts.get(i).GetVariables().size() <= disjuncts.get(j).GetVariables().size())
+					{
+						localMaxSize = disjuncts.get(i).GetVariables().size();
+					}
+					else
+					{
+						ekwality = false;
+					}
+					// we have two situations: the last (j) disjunct should be less or equal to current (i)
+					// disjunct -- so that we can delete him, else it would be unnesessary and wrong
+					// because we should prevent expansion instead of giving a "chance" to the new disjunct!!!
+					for (int k = 0; k < localMaxSize; k++)
+					{
+						boolean localEkwality = false;
+						for (int l = 0; l < disjuncts.get(j).GetVariables().size(); l++)
+						{
+							if ((disjuncts.get(i).GetVariables().get(k).GetName().equals(disjuncts.get(j).GetVariables().get(l).GetName())) // don't forget "!"
+									&&
+									(disjuncts.get(i).GetVariables().get(k).GetDenial() ==
+									disjuncts.get(j).GetVariables().get(l).GetDenial()))
+							{
+								//System.out.println((i + 1) + " " + (j + 1) + " " + (k + 1) + " " + (l + 1));
+								localEkwality = true;
+							}
+						}
+						if (localEkwality == false)
+						{
+							ekwality = false;
+						}
+					}
+				}
+				else
+				{
+					ekwality = false;
+				}
+				if (ekwality == true)
+				{
+					disjuncts.remove(j);
+					j = j - 1;
+				}
+				else if (disjuncts.get(j).GetOne() == true)
+				{
+					disjuncts.remove(j);
+					j = j - 1;
+				}
+			}
+		}
+	}
+	
 	public void Refresh()
 	{
 		for (int i = 0; i < disjuncts.size() - 1; i++)
@@ -1044,13 +1104,15 @@ public class ResolutionFunction
 	// ---------- STRIKEOUT STRATEGY ---------- (not ready yet)
 	
 	public void ResolutionStrikeout () // strikeout strategy demonstration
-	{
+	{		
 		int i;
 		int j;
 		int k;
 		int l;
 		int c;
+		int iter = 1;
 		boolean repeat = true;
+		boolean adding = false; // adding disjuncts in the end indicator
 		ResolutionFunction localF = new ResolutionFunction();
 		localF.GetDisjuncts().addAll(disjuncts);
 		disjuncts.removeAll(disjuncts);
@@ -1065,7 +1127,7 @@ public class ResolutionFunction
 			localF.Refresh();
 			disjuncts.addAll(localF.GetDisjuncts());
 			this.SortD(); // the order is important
-			this.Refresh(); // it's only here, because at the end it doesn't work
+			this.RefreshExtension(d); // it's only here, because at the end it doesn't work
 			for (i = 0; i < disjuncts.size() - 1; i++)
 			{
 				ResolutionDisjunct localDisjunct = disjuncts.get(i);
@@ -1110,6 +1172,12 @@ public class ResolutionFunction
 								localNewDisjunct.Refresh();
 								localNewDisjunct.Sort();
 								
+								if (localNewDisjunct.GetEmpty())
+								{
+									repeat = false;
+									adding = true;
+								}
+								
 								localFR.SetDisjuncts(localNewDisjunct);
 							}
 						}
@@ -1121,6 +1189,18 @@ public class ResolutionFunction
 				repeat = false;
 			}
 			localF = localFR;
+			if (adding)
+			{
+				//d = disjuncts.size();
+				//disjuncts.addAll(localF.GetDisjuncts());
+				
+				d = disjuncts.size();
+				localF.SortD(); // the order is important
+				localF.Refresh();
+				disjuncts.addAll(localF.GetDisjuncts());
+				this.SortD(); // the order is important
+				this.RefreshExtension(d); // it's only here, because at the end it doesn't work
+			}
 		}
 	}
 }
