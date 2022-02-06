@@ -11,8 +11,7 @@ import java.util.Comparator;
  * Variables and predicates can be sorted (in alphabet order) and refreshed (deleted repeated vars/preds, changed to 1 or empty disjunct).
  * A disjunct containing an information about id, contrary parents, list of vars/preds (in order).
  * @author MatmanBJ
- * @version alpha 0.18
- * @since alpha 0.18
+ * @version alpha 0.19
  */
 public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 {
@@ -68,6 +67,21 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		parents[0] = 0;
 		parents[1] = 0;
 		contrary = "0";
+	}
+	
+	public ResolutionDisjunct (ResolutionDisjunct localDisjunct)
+	{
+		one = localDisjunct.GetOne();
+		empty = localDisjunct.GetEmpty();
+		//predicates.addAll(new ArrayList<ResolutionPredicate>(localDisjunct.GetPredicates()));
+		for (ResolutionPredicate p : localDisjunct.GetPredicates())
+		{
+			predicates.add(new ResolutionPredicate(p));
+		}
+		id = localDisjunct.GetID();
+		parents[0] = localDisjunct.GetParents()[0];
+		parents[1] = localDisjunct.GetParents()[1];
+		contrary = new String(localDisjunct.GetContrary());
 	}
 	
 	// ---------- SETTERS ----------

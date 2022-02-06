@@ -1,0 +1,16 @@
+P(x,y,z) + Q(x,y)
+!P(y,y,y)
+!Q(α,α)
+
+P(f(g(x)),y,z) + Q(α,β)
+!P(y,y,y)
+!Q(α,x)
+
+P(α)
+!D(y) + L(α,y)
+!P(x) + !Z(y) + !L(x,y)
+D(β)
+Z(β)
+
+P(x,f(y),z,α,g(f(x)))
+!P(f(y),x,g(y),y,u)

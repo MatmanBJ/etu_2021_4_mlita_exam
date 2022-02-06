@@ -18,9 +18,8 @@ import java.util.HashSet;
 
 /**
  * Main class "ResolutionMethod"
- * @author Matthew Sobolewski (a.k.a. MatmanBJ) and Victor Stepovik
- * @version alpha 0.18
- * @since alpha 0.18
+ * @author MatmanBJ
+ * @version alpha 0.19
  */
 public class ResolutionMethod
 {
@@ -317,6 +316,8 @@ public class ResolutionMethod
 			else if (typeLogic.equals("predicate"))
 			{
 				ResolutionFunction test = new ResolutionFunction(111);
+				test.ResolutionAllUniquePredicate();
+				test.GetFunctionPredicate();
 			}
 			else
 			{

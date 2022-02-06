@@ -8,8 +8,7 @@ import java.util.ArrayList;
  * but they can have term type (constants, variables and functions) and terms list (only for functions).
  * Terms [instead of predicates and "classic" statement-logic variables] in the predicate (and in the functions) can't change their place.
  * @author MatmanBJ
- * @version alpha 0.18
- * @since alpha 0.18
+ * @version alpha 0.19
  */
 public class ResolutionTerm
 {
@@ -43,6 +42,18 @@ public class ResolutionTerm
 	{
 		term = localTerm;
 		name = localName;
+	}
+	
+	public ResolutionTerm (ResolutionTerm localTerm)
+	{
+		term = localTerm.GetTerm();
+		name = new String(localTerm.GetName());
+		//terms = new ArrayList<ResolutionTerm>(terms);
+		//terms.addAll(localTerm.GetTerms());
+		for (ResolutionTerm p : localTerm.GetTerms())
+		{
+			terms.add(new ResolutionTerm(p));
+		}
 	}
 	
 	// ---------- SETTERS ----------
@@ -106,21 +117,186 @@ public class ResolutionTerm
 	// 3 -- REALIZOVAL FUNKCIJU I UNIFIKACIJU
 	// 4 -- REALIZOVAT LINEJNUJU REZOLUCIJU
 	
+	public boolean localFunctionCheck (ResolutionTerm localTerm) // for vars only
+	{
+		boolean localEquality = true;
+		for (int x = 0; x < localTerm.GetTerms().size(); x++)
+		{
+			if (localTerm.GetTerms().get(x).GetTerm().equals(ResolutionTerm.GetFunction()))
+			{
+				localEquality = this.localFunctionCheck(localTerm.GetTerms().get(x));
+				if (localEquality == false)
+				{
+					x = localTerm.GetTerms().size();
+				}
+			}
+			else if (localTerm.GetTerms().get(x).GetTerm().equals(ResolutionTerm.GetVariable()))
+			{
+				if (localTerm.GetTerms().get(x).equals(this))
+				{
+					localEquality = false;
+					x = localTerm.GetTerms().size();
+				}
+			}
+		}
+		return localEquality;
+	}
+	
+	public void localUnification (ResolutionTerm localRTThis, ResolutionTerm localRT)
+	{
+		ResolutionTerm localUnificationTerm;
+		boolean localEquality = true;
+		if ((localRTThis.GetTerm().equals(ResolutionTerm.GetVariable()) && localRT.GetTerm().equals(ResolutionTerm.GetVariable()))
+				|| (localRTThis.GetTerm().equals(ResolutionTerm.GetVariable()) && localRT.GetTerm().equals(ResolutionTerm.GetConstant()))
+				|| (localRTThis.GetTerm().equals(ResolutionTerm.GetConstant()) && localRT.GetTerm().equals(ResolutionTerm.GetVariable()))
+				|| (localRTThis.GetTerm().equals(ResolutionTerm.GetConstant()) && localRT.GetTerm().equals(ResolutionTerm.GetConstant())
+				&& localRTThis.GetName().equals(localRT.GetName())))
+		{
+			localEquality = true;
+		}
+		else if (false)
+		{
+			
+		}
+		else if (localRTThis.GetTerm().equals(ResolutionTerm.GetFunction()) && localRT.equals(ResolutionTerm.GetFunction())
+				&& localRTThis.GetName().equals(localRT.GetName()) && localRTThis.GetTerms().size() == localRT.GetTerms().size())
+		{
+			localEquality = true;
+			for (int x = 0; x < localRTThis.GetTerms().size(); x++)
+			{
+				if (localRTThis.GetTerms().get(x).pseudoEquals(localRT.GetTerms().get(x)))
+				{
+					localEquality = true;
+				}
+				else
+				{
+					localEquality = false;
+					x = localRTThis.GetTerms().size();
+				}
+			}
+		}
+		else if (localRTThis.GetTerm().equals(ResolutionTerm.GetVariable()) && localRT.equals(ResolutionTerm.GetFunction()))
+		{
+			localEquality = localRTThis.localFunctionCheck(localRT);
+		}
+		else if (localRTThis.GetTerm().equals(ResolutionTerm.GetFunction()) && localRT.equals(ResolutionTerm.GetVariable()))
+		{
+			localEquality = localRT.localFunctionCheck(localRTThis);
+		}
+		else
+		{
+			localEquality = false;
+		}
+	}
+	
+	public void change (ResolutionTerm [] localTerm)
+	{
+		if (this.GetTerms().size() == 0 && this.GetTerm().equals(ResolutionTerm.GetVariable()) && this.GetName().equals(localTerm[0].GetName()))
+		{
+			this.SetName(new String(localTerm[1].GetName()));
+			this.SetTerm(localTerm[1].GetTerm());
+			this.GetTerms().addAll(localTerm[1].GetTerms());
+			//System.out.println(this.GetName() + " " + this.GetTerms().size());
+			System.out.println(this.GetName() + " " + localTerm[0].GetName() + " " + localTerm[1].GetName());
+		}
+		else if (this.GetTerms().size() > 0)
+		{
+			for (int i = 0; i < this.GetTerms().size(); i++)
+			{
+				this.GetTerms().get(i).change(localTerm);
+			}
+		}
+	}
+	
+	public ResolutionTerm [] unification (Object localObject)
+	{
+		ResolutionTerm localTerm = (ResolutionTerm) localObject;
+		ResolutionTerm [] localT = new ResolutionTerm[2];
+		//boolean localEquality;
+		//System.out.println("in if again");
+		if (this.GetTerm().equals(ResolutionTerm.GetVariable()) && localTerm.GetTerm().equals(ResolutionTerm.GetVariable()))
+		{
+			localT[0] = localTerm;
+			localT[1] = this;
+		}
+		else if (this.GetTerm().equals(ResolutionTerm.GetVariable()) && localTerm.GetTerm().equals(ResolutionTerm.GetConstant()))
+		{
+			localT[0] = this;
+			localT[1] = localTerm;
+		}
+		else if (this.GetTerm().equals(ResolutionTerm.GetConstant()) && localTerm.GetTerm().equals(ResolutionTerm.GetVariable()))
+		{
+			localT[0] = localTerm;
+			localT[1] = this;
+		}
+		else if (this.GetTerm().equals(ResolutionTerm.GetConstant()) && localTerm.GetTerm().equals(ResolutionTerm.GetConstant()) && this.GetName().equals(localTerm.GetName()))
+		{
+			localT[0] = localTerm;
+			localT[1] = this;
+		}
+		else if (this.GetTerm().equals(ResolutionTerm.GetFunction()) && localTerm.GetTerm().equals(ResolutionTerm.GetFunction())
+				&& this.GetName().equals(localTerm.GetName()) && this.GetTerms().size() == localTerm.GetTerms().size())
+		{
+			localT = this.unification(localTerm);
+		}
+		else if (this.GetTerm().equals(ResolutionTerm.GetVariable()) && localTerm.GetTerm().equals(ResolutionTerm.GetFunction()))
+		{
+			localT[0] = this;
+			localT[1] = localTerm;
+		}
+		else if (this.GetTerm().equals(ResolutionTerm.GetFunction()) && localTerm.GetTerm().equals(ResolutionTerm.GetVariable()))
+		{
+			localT[0] = localTerm;
+			localT[1] = this;
+		}
+		else
+		{
+			localT = null;
+		}
+		if (localT != null)
+		{
+			localT[0] = new ResolutionTerm(localT[0]);
+			localT[1] = new ResolutionTerm(localT[1]);
+		}
+		return localT;
+	}
+	
 	public boolean pseudoEquals (Object localObject)
 	{
 		ResolutionTerm localTerm = (ResolutionTerm) localObject;
-		boolean localEquality = true;
-		if ((this.GetName().equals(localTerm.GetName())) && (this.GetTerms().size() == localTerm.GetTerms().size()))
+		boolean localEquality;
+		if ((this.GetTerm().equals(ResolutionTerm.GetVariable()) && localTerm.GetTerm().equals(ResolutionTerm.GetVariable()))
+				|| (this.GetTerm().equals(ResolutionTerm.GetVariable()) && localTerm.GetTerm().equals(ResolutionTerm.GetConstant()))
+				|| (this.GetTerm().equals(ResolutionTerm.GetConstant()) && localTerm.GetTerm().equals(ResolutionTerm.GetVariable()))
+				|| (this.GetTerm().equals(ResolutionTerm.GetConstant()) && localTerm.GetTerm().equals(ResolutionTerm.GetConstant())
+				&& this.GetName().equals(localTerm.GetName())))
 		{
-			for (int z = 0; z < localTerm.GetTerms().size(); z++)
+			localEquality = true;
+		}
+		else if (this.GetTerm().equals(ResolutionTerm.GetFunction()) && localTerm.GetTerm().equals(ResolutionTerm.GetFunction())
+				&& this.GetName().equals(localTerm.GetName()) && this.GetTerms().size() == localTerm.GetTerms().size())
+		{
+			localEquality = true;
+			for (int x = 0; x < this.GetTerms().size(); x++)
 			{
-				boolean localEkwality = this.GetTerms().get(z).pseudoEquals(localTerm.GetTerms().get(z));
-				if (!localEkwality)
+				if (this.GetTerms().get(x).pseudoEquals(localTerm.GetTerms().get(x)))
 				{
-					localEquality = localEkwality;
-					z = localTerm.GetTerms().size();
+					localEquality = true;
+				}
+				else
+				{
+					localEquality = false;
+					x = this.GetTerms().size();
 				}
 			}
+		}
+		else if (this.GetTerm().equals(ResolutionTerm.GetVariable()) && localTerm.GetTerm().equals(ResolutionTerm.GetFunction()))
+		{
+			localEquality = this.localFunctionCheck(localTerm);
+		}
+		else if (this.GetTerm().equals(ResolutionTerm.GetFunction()) && localTerm.GetTerm().equals(ResolutionTerm.GetVariable()))
+		{
+			localEquality = localTerm.localFunctionCheck(this);
 		}
 		else
 		{
@@ -158,8 +334,10 @@ public class ResolutionTerm
 		boolean localConstant = false;
 		for (int m = 0; m < localString.length(); m++)
 		{
-			if (greekAlphabet.contentEquals(String.valueOf(localString.charAt(m))))
+			System.out.println(String.valueOf(localString.charAt(m)));
+			if (greekAlphabet.contains(String.valueOf(localString.charAt(m))))
 			{
+				System.out.println("ZZZZZ");
 				localConstant = true;
 			}
 		}
@@ -180,8 +358,8 @@ public class ResolutionTerm
 					//System.out.println(localPredicateString.charAt(localJ));
 					//System.out.println(localPredicateString + String.valueOf(localJ));
 					localName = localName.concat(String.valueOf(localPredicateString.charAt(localJ)));
-					System.out.println(String.valueOf(localPredicateString.charAt(localJ)));
-					System.out.println(localName);
+					//System.out.println(String.valueOf(localPredicateString.charAt(localJ)));
+					//System.out.println(localName);
 					localJ = localJ + 1;
 				}
 				else
@@ -243,8 +421,8 @@ public class ResolutionTerm
 					//System.out.println(localPredicateString.charAt(localJ));
 					//System.out.println(localPredicateString + String.valueOf(localJ));
 					localName = localName.concat(String.valueOf(localPredicateString.charAt(localJ)));
-					System.out.println(String.valueOf(localPredicateString.charAt(localJ)));
-					System.out.println(localName);
+					//System.out.println(String.valueOf(localPredicateString.charAt(localJ)));
+					//System.out.println(localName);
 					localJ = localJ + 1;
 				}
 				else
