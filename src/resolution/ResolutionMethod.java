@@ -1,9 +1,10 @@
 // Alternative exam -- 4 term
 // Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.05
+// Resolution method version alpha 0.06
 // Updates:
-// -- variable name is in the "ResolutionVariable" class now (code changed for that)
-// -- variable constructor, disjuncts output and functions changed
+// -- Scanner error with close I/O system fixed
+// -- console input and solving are in while loop now
+// -- console input and example are in main class' methods now
 
 package resolution;
 
@@ -14,7 +15,7 @@ import java.util.HashSet;
 
 public class ResolutionMethod
 {
-	public static void main(String[] args)
+	public static void ExampleOne() // old and unupdated example
 	{
 		/*ResolutionVar a = new ResolutionVar('a');
 		ResolutionVar b = new ResolutionVar('b');
@@ -59,7 +60,9 @@ public class ResolutionMethod
 		ResolutionVar z = new ResolutionVar ('z');
 		ResolutionVar t = new ResolutionVar ('t');
 		ResolutionVar s = new ResolutionVar ('s');*/
-		
+	}
+	public static void ExampleTwo()
+	{
 		ArrayList<ResolutionVariable> variables = new ArrayList<ResolutionVariable>();
 		
 		variables.add(new ResolutionVariable(false, 'x'));
@@ -106,9 +109,28 @@ public class ResolutionMethod
 		//d_func.Resolution();
 		d_func.GetFunction();
 		//d_func_return.GetFunction();
-		
+	}
+	public static void InputConsole()
+	{
 		ResolutionFunction cons = new ResolutionFunction("INPUT");
 		cons.ResolutionHash();
 		cons.GetFunction();
+	}
+	public static void main(String[] args)
+	{
+		ExampleTwo();
+		
+		Scanner inputScanner = new Scanner(System.in);
+		int key = 1;
+		
+		while (key != 0)
+		{
+			InputConsole();
+			System.out.println("Do you want to input something else? Press 0 to NO, press else to YES:");
+			key = inputScanner.nextInt();
+		}
+		
+		inputScanner.close(); // be careful: it closes I/O system, so if you do it once, you can not use I/O again!
+		System.out.println("---------- Bye!!! ----------");
 	}
 }

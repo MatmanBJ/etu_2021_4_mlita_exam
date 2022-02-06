@@ -66,7 +66,7 @@ public class ResolutionFunction
 		this.RefreshD();
 		this.SortD();
 		this.Refresh();
-		localInputScanner.close();
+		//localInputScanner.close();
 	}
 	
 	// ---------- SETTERS ----------
