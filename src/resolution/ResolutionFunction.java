@@ -42,23 +42,22 @@ public class ResolutionFunction
 			//localInputScanner.nextLine();
 			//System.out.println(local.length());
 			
-			int j = 0;
-			while (j < localInputString[i].length())
+			String localInputVars [] = localInputString[i].split("\\s");
+			for (int j = 0; j < localInputVars.length; j++)
 			{
-				if (localInputString[i].charAt(j) != ' ' && localInputString[i].charAt(j) != '+')
+				if (!localInputVars[j].equals("") && !localInputVars[j].contains("+"))
 				{
-					if (localInputString[i].charAt(j) == '!')
+					if (localInputVars[j].charAt(0) == '!')
 					{
-						localInputVariables.add(new ResolutionVariable(false, localInputString[i].charAt(j + 1)));
-						j = j + 1;
+						localInputVariables.add(new ResolutionVariable(false, localInputVars[j].charAt(1)));
 					}
 					else
 					{
-						localInputVariables.add(new ResolutionVariable(true, localInputString[i].charAt(j)));
+						localInputVariables.add(new ResolutionVariable(true, localInputVars[j].charAt(0)));
 					}
 				}
-				j = j + 1;
 			}
+			
 			ResolutionDisjunct localInputDisjunct = new ResolutionDisjunct(localInputVariables);
 			disjuncts.add(localInputDisjunct);
 			this.GetOneDisjunct(i + 1);
@@ -279,22 +278,20 @@ public class ResolutionFunction
     			//localInputScanner.nextLine();
     			//System.out.println(local.length());
     			
-    			int j = 0;
-    			while (j < localBufferStringArray[i].length())
+    			String localInputVars [] = localBufferStringArray[i].split("\\s");
+    			for (int j = 0; j < localInputVars.length; j++)
     			{
-    				if (localBufferStringArray[i].charAt(j) != ' ' && localBufferStringArray[i].charAt(j) != '+')
+    				if (!localInputVars[j].equals("") && !localInputVars[j].contains("+"))
     				{
-    					if (localBufferStringArray[i].charAt(j) == '!')
+    					if (localInputVars[j].charAt(0) == '!')
     					{
-    						localInputVariables.add(new ResolutionVariable(false, localBufferStringArray[i].charAt(j + 1)));
-    						j = j + 1;
+    						localInputVariables.add(new ResolutionVariable(false, localInputVars[j].charAt(1)));
     					}
     					else
     					{
-    						localInputVariables.add(new ResolutionVariable(true, localBufferStringArray[i].charAt(j)));
+    						localInputVariables.add(new ResolutionVariable(true, localInputVars[j].charAt(0)));
     					}
     				}
-    				j = j + 1;
     			}
     			ResolutionDisjunct localInputDisjunct = new ResolutionDisjunct(localInputVariables);
     			disjuncts.add(localInputDisjunct);

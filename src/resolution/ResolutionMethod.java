@@ -1,8 +1,8 @@
 // Alternative exam -- 4 term
 // Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.11
+// Resolution method version alpha 0.12
 // Updates:
-// -- Input function updated
+// -- Input function updated again
 
 package resolution;
 
