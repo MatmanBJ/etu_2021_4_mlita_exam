@@ -1,4 +1,4 @@
-!V v !Y v !X v !U
-Z v X v U
-V v U
-Z v X v !U v !Y
+!V + !Y + !X + !U
+Z + X + U
+V + U
+Z + X + !U + !Y

@@ -1,8 +1,11 @@
 // Alternative exam -- 4 term
 // Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.09
+// Resolution method version alpha 0.10
 // Updates:
-// -- Minor bug fixes
+// -- Deleted possibility to use 'v' as '+' (because 'v' can be variable)
+// -- All used 'v' was changed to '+'
+// -- Added contrary variable in the disjuct class
+// -- Resolution function updated and fixed
 
 package resolution;
 
@@ -224,7 +227,8 @@ public class ResolutionMethod
 			typeOutput = inputScanner.nextLine();
 			
 			localFunction = InputMain(typeInput);
-			localFunction.ResolutionHash();
+			//localFunction.ResolutionHash();
+			localFunction.ResolutionAllUnique();
 			OutputMain(localFunction, typeOutput);
 			
 			System.out.println("Do you want to input something else? Press 0 to NO, press else to YES:");

@@ -14,6 +14,7 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 	private boolean one; // if TRUE -- disjunct = 1
 	private boolean empty; // if TRUE -- disjunct = empty (0)
 	private int [] parents = new int [2];
+	private String contrary; // the contrary variable of parents
 	private ArrayList<ResolutionVariable> variables = new ArrayList<ResolutionVariable>();
 	
 	// -----------------------------
@@ -28,6 +29,7 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		empty = false;
 		parents[0] = 0;
 		parents[1] = 0;
+		contrary = "0";
 	}
 	
 	public ResolutionDisjunct (ArrayList<ResolutionVariable> localResolutionVariable) // special constructor
@@ -37,6 +39,7 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		variables.addAll(localResolutionVariable);
 		parents[0] = 0;
 		parents[1] = 0;
+		contrary = "0";
 	}
 	
 	// ---------- SETTERS ----------
@@ -54,6 +57,10 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		parents[0] = localParents[0];
 		parents[1] = localParents[1];
 	}
+	public void SetContrary (String localContrary)
+	{
+		contrary = localContrary;
+	}
 	public void SetVariables (ResolutionVariable localVariables)
 	{
 		variables.add(localVariables);
@@ -69,9 +76,13 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 	{
 		return empty;
 	}
-	public int [] GetParents()
+	public int [] GetParents ()
 	{
 		return parents;
+	}
+	public String GetContrary ()
+	{
+		return contrary;
 	}
 	public ArrayList<ResolutionVariable> GetVariables ()
 	{

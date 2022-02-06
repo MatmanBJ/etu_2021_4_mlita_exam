@@ -1,6 +1,7 @@
-!x v !y v !z
-!x v !t v s
-!x v !s
-!x v y v t
-x
-z
+!x + !d
+!p + s
+x + y
+p + !r
+!s + d
+r
+!y
