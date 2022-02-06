@@ -1,0 +1,9 @@
+!x v !y v z
+!z v !t v s
+u v t
+u v !s
+!x v !y v u
+!x v y
+x
+y
+!u

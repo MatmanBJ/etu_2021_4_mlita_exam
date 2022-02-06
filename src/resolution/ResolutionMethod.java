@@ -1,10 +1,8 @@
 // Alternative exam -- 4 term
 // Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.08
+// Resolution method version alpha 0.09
 // Updates:
-// -- File reading function added
-// -- File output bux fixes
-// -- Other minor updates
+// -- Minor bug fixes
 
 package resolution;
 
