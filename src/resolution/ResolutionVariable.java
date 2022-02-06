@@ -8,7 +8,6 @@ public class ResolutionVariable
 	
 	private boolean denial; // if TRUE -- no denial, if FALSE -- inverse
 	private String name;
-	//private ResolutionVar var;
 	
 	// -----------------------------
 	// ---------- METHODS ----------
@@ -23,7 +22,6 @@ public class ResolutionVariable
 	{
 		denial = localDenial;
 		name = localName;
-		//var = localVar;
 	}
 	
 	// ---------- SETTERS ----------
@@ -36,10 +34,6 @@ public class ResolutionVariable
 	{
 		name = localName;
 	}
-	/*public void SetVar (ResolutionVar localVar)
-	{
-		var = localVar;
-	}*/
 	
 	// ---------- GETTERS ----------
 	
@@ -51,8 +45,29 @@ public class ResolutionVariable
 	{
 		return name;
 	}
-	/*public ResolutionVar GetVar ()
+	
+	// ---------- METHODS ----------
+	
+	@Override
+	public boolean equals (Object localObject) // also i need to override a "hashCode" method, but i don't need it
 	{
-		return var;
-	}*/
+        if (localObject == null)
+        {
+            return false;
+        }
+        
+        if (localObject.getClass() != this.getClass())
+        {
+            return false;
+        }
+        
+		final ResolutionVariable localResolutionVariable = (ResolutionVariable) localObject;
+		
+		if (!this.name.equals(localResolutionVariable.name) || this.denial != localResolutionVariable.denial)
+		{
+			return false;
+		}
+		
+		return true;
+	}
 }

@@ -1,8 +1,9 @@
 // Alternative exam -- 4 term
 // Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.16
+// Resolution method version alpha 0.17
 // Updates:
-// -- Demonstration methods algorithm fixed
+// -- Output algorithm updated (using overload functions)
+// -- Input from console and file algorithm updated ("1" and "□" reading added)
 
 package resolution;
 
@@ -280,6 +281,9 @@ public class ResolutionMethod
 		
 		while (key != 0)
 		{
+			System.out.println("ΑαΒβΓγΔδΕεΖζΗηΘθΙιΚκΛλΜμΝνΞξΟοΠπΡρΣσςΤτΥυΦφΧχΨψΩω");
+			System.out.println(ResolutionTerm.GetGreekAlphabet().contains("α"));
+			
 			ResolutionDisjunct.SetMaxID();
 			
 			System.out.println("Please write type of input (<type>):");
