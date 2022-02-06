@@ -42,7 +42,8 @@ public class ResolutionFunction
 			//localInputScanner.nextLine();
 			//System.out.println(local.length());
 			
-			for (int j = 0; j < localInputString[i].length(); j++)
+			int j = 0;
+			while (j < localInputString[i].length())
 			{
 				if (localInputString[i].charAt(j) != ' ' && localInputString[i].charAt(j) != '+')
 				{
@@ -56,6 +57,7 @@ public class ResolutionFunction
 						localInputVariables.add(new ResolutionVariable(true, localInputString[i].charAt(j)));
 					}
 				}
+				j = j + 1;
 			}
 			ResolutionDisjunct localInputDisjunct = new ResolutionDisjunct(localInputVariables);
 			disjuncts.add(localInputDisjunct);
@@ -277,7 +279,8 @@ public class ResolutionFunction
     			//localInputScanner.nextLine();
     			//System.out.println(local.length());
     			
-    			for (int j = 0; j < localBufferStringArray[i].length(); j++)
+    			int j = 0;
+    			while (j < localBufferStringArray[i].length())
     			{
     				if (localBufferStringArray[i].charAt(j) != ' ' && localBufferStringArray[i].charAt(j) != '+')
     				{
@@ -291,6 +294,7 @@ public class ResolutionFunction
     						localInputVariables.add(new ResolutionVariable(true, localBufferStringArray[i].charAt(j)));
     					}
     				}
+    				j = j + 1;
     			}
     			ResolutionDisjunct localInputDisjunct = new ResolutionDisjunct(localInputVariables);
     			disjuncts.add(localInputDisjunct);

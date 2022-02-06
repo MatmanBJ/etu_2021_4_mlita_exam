@@ -1,11 +1,8 @@
 // Alternative exam -- 4 term
 // Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.10
+// Resolution method version alpha 0.11
 // Updates:
-// -- Deleted possibility to use 'v' as '+' (because 'v' can be variable)
-// -- All used 'v' was changed to '+'
-// -- Added contrary variable in the disjuct class
-// -- Resolution function updated and fixed
+// -- Input function updated
 
 package resolution;
 
