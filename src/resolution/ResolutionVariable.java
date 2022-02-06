@@ -1,5 +1,11 @@
 package resolution;
 
+/**
+ * Resolution variable class.
+ * @author MatmanBJ
+ * @version alpha 0.18
+ * @since alpha 0.18
+ */
 public class ResolutionVariable
 {
 	// -------------------------------

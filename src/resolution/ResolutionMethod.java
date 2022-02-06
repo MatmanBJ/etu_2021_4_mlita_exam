@@ -1,8 +1,13 @@
 // Alternative exam -- 4 term
-// Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.18
+// © Matthew Sobolewski and Victor Stepovik
+// Resolution method version alpha 0.19
 // Updates:
 // -- Full predicate input added
+// -- Greek alphabet and special symbols to copy added
+// -- ID and disjunct (at one time) number added
+// -- Output inverse ("!") type fixed and updated
+// -- Input minor fixes
+// -- Javadoc documentation added
 
 package resolution;
 
@@ -11,6 +16,12 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.HashSet;
 
+/**
+ * Main class "ResolutionMethod"
+ * @author Matthew Sobolewski (a.k.a. MatmanBJ) and Victor Stepovik
+ * @version alpha 0.18
+ * @since alpha 0.18
+ */
 public class ResolutionMethod
 {
 	public static void ExampleOne() // old and unupdated example
@@ -281,8 +292,8 @@ public class ResolutionMethod
 		
 		while (key != 0)
 		{
-			System.out.println("ΑαΒβΓγΔδΕεΖζΗηΘθΙιΚκΛλΜμΝνΞξΟοΠπΡρΣσςΤτΥυΦφΧχΨψΩω");
-			System.out.println(ResolutionTerm.GetGreekAlphabet().contains("α"));
+			System.out.println("Greek alphabet to copy: " + ResolutionTerm.GetGreekAlphabet());
+			System.out.println("Special symbol to copy: " + "□\n");
 			
 			ResolutionDisjunct.SetMaxID();
 			

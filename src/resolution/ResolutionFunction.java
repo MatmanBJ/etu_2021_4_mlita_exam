@@ -9,6 +9,14 @@ import java.io.*;
 import java.util.Arrays;
 import java.lang.Object.*;
 
+/**
+ * This class a function, that contains disjuncts.
+ * By default, it is commonly prepared for the resolution.
+ * A function contains a list with disjuncts.
+ * @author MatmanBJ
+ * @version alpha 0.18
+ * @since alpha 0.18
+ */
 public class ResolutionFunction
 {
 	// -------------------------------
@@ -67,21 +75,9 @@ public class ResolutionFunction
 				}
 			}
 			
-			ResolutionDisjunct localInputDisjunct;
-			if (localEmpty == true)
-			{
-				localInputDisjunct = new ResolutionDisjunct();
-				localInputDisjunct.SetEmpty(localEmpty);
-			}
-			else if (localOne == true)
-			{
-				localInputDisjunct = new ResolutionDisjunct();
-				localInputDisjunct.SetOne(localOne);
-			}
-			else
-			{
-				localInputDisjunct = new ResolutionDisjunct(localInputVariables);
-			}
+			ResolutionDisjunct localInputDisjunct = new ResolutionDisjunct(localInputVariables);
+			localInputDisjunct.SetEmpty(localEmpty);
+			localInputDisjunct.SetOne(localOne);
 			
 			disjuncts.add(localInputDisjunct);
 			this.GetOneDisjunct(i + 1);
@@ -124,30 +120,6 @@ public class ResolutionFunction
 			{
 				if (!localInputPredicates[j].equals("") && !localInputPredicates[j].contains("+") && !localInputPredicates[j].equals("□") && !localInputPredicates[j].equals("1"))
 				{
-					HashMap<Character, Integer> localMap = new HashMap<Character, Integer>();
-					String s = "aasjjikkk";
-					char c = '(';
-					for (int localI = 0; localI < s.length(); localI++)
-					{
-					    Integer val = localMap.get(c);
-					    if (val != null)
-					    {
-					    	localMap.put(c, val + 1);
-					    }
-					    else
-					    {
-					    	localMap.put(c, 1);
-					    }
-					}
-					
-					for (int localJ = 0; localJ < localInputPredicates[j].length(); localJ++)
-					{
-						if (localInputPredicates[j].charAt(localJ) == '(' || localInputPredicates[j].charAt(localJ) == ')')
-						{
-							
-						}
-					}
-					
 					if (localInputPredicates[j].charAt(0) == '!')
 					{
 						localInputPredicates[j] = localInputPredicates[j].substring(1);
@@ -173,22 +145,6 @@ public class ResolutionFunction
 					}
 					
 					localInputPreds.add(localPredicate);
-					
-					//int ooo = localInputPredicates[j].
-					
-					//String localInputVars [] = localInputPredicates[j].split(";");
-					//String localPredicate;
-					//String localVars;
-					//localInputPredicates[j].indexOf('(');
-					//localInputPredicates[j].lastIndexOf(')');
-					/*if (localInputPredicates[j].charAt(0) == '!')
-					{
-						localInputVariables.add(new ResolutionVariable(false, localInputPredicates[j].substring(1)));
-					}
-					else
-					{
-						localInputVariables.add(new ResolutionVariable(true, localInputPredicates[j]));
-					}*/
 				}
 				else if (localInputPredicates[j].equals("□"))
 				{
@@ -200,21 +156,9 @@ public class ResolutionFunction
 				}
 			}
 			
-			ResolutionDisjunct localInputDisjunct;
-			if (localEmpty == true)
-			{
-				localInputDisjunct = new ResolutionDisjunct();
-				localInputDisjunct.SetEmpty(localEmpty);
-			}
-			else if (localOne == true)
-			{
-				localInputDisjunct = new ResolutionDisjunct();
-				localInputDisjunct.SetOne(localOne);
-			}
-			else
-			{
-				localInputDisjunct = new ResolutionDisjunct(localInputPreds, 1);
-			}
+			ResolutionDisjunct localInputDisjunct = new ResolutionDisjunct(localInputPreds, 1);
+			localInputDisjunct.SetEmpty(localEmpty);
+			localInputDisjunct.SetOne(localOne);
 			
 			disjuncts.add(localInputDisjunct);
 			
@@ -222,13 +166,6 @@ public class ResolutionFunction
 			ArrayList<ResolutionPredicate> variables = localDisjunct.GetPredicates();
 			System.out.print("Input " + i + ": ");
 			System.out.println(localDisjunct.toStringPredicate());
-			
-			//this.GetOneDisjunct(i + 1);
-			
-			//System.out.println("New disjunct? 0 -- no, 1 -- yes:");
-			
-			// UPDATE INPT FUNCTION WITH BOOLEAN
-			// UPDATE INPUT FUNCTION WITH EMPTY?ONE
 
 		}
 		this.RefreshD();
@@ -253,8 +190,13 @@ public class ResolutionFunction
 		return disjuncts;
 	}
 	
-	// ---------- OTHERS ----------
+	// ---------- METHODS ----------
 	
+	/**
+	 * This method consistently applies "Sort" method from "ResolutionDisjunct" class for each disjunct in the function.
+	 * @see {@link resolution.ResolutionDisjunct#Sort() Sort()}
+	 * @see {@link resolution.ResolutionDisjunct ResolutionDisjunct}
+	 */
 	public void SortD ()
 	{
 		for (int i = 0; i < disjuncts.size(); i++)
@@ -263,6 +205,11 @@ public class ResolutionFunction
 		}
 	}
 	
+	/**
+	 * This method consistently applies "Refresh" method from "ResolutionDisjunct" class for each disjunct in the function.
+	 * @see {@link resolution.ResolutionDisjunct#Sort() Refresh()}
+	 * @see {@link resolution.ResolutionDisjunct ResolutionDisjunct}
+	 */
 	public void RefreshD ()
 	{
 		for (int i = 0; i < disjuncts.size(); i++)
@@ -392,7 +339,8 @@ public class ResolutionFunction
 		int i = 1;
 		for (ResolutionDisjunct localDisjunct : disjuncts)
 		{
-			System.out.print(localDisjunct.toOutputString());
+			System.out.print(localDisjunct.toOutputString(i));
+			i = i + 1;
 		}
 	}
 	
@@ -553,7 +501,7 @@ public class ResolutionFunction
 			for (ResolutionDisjunct localDisjunct : disjuncts)
 			{
 				ArrayList<ResolutionVariable> variables = localDisjunct.GetVariables();
-				localOut[i - 1] = localDisjunct.toOutputString();
+				localOut[i - 1] = localDisjunct.toOutputString(i);
 				i = i + 1;
 			}
 			i = 1;

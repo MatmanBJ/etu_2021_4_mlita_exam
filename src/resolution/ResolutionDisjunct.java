@@ -6,6 +6,14 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Comparator;
 
+/**
+ * This class represents disjuncts, that containing "classic" statement-logic variables or predicates.
+ * Variables and predicates can be sorted (in alphabet order) and refreshed (deleted repeated vars/preds, changed to 1 or empty disjunct).
+ * A disjunct containing an information about id, contrary parents, list of vars/preds (in order).
+ * @author MatmanBJ
+ * @version alpha 0.18
+ * @since alpha 0.18
+ */
 public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 {
 	// -------------------------------
@@ -129,9 +137,13 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		return predicates;
 	}
 	
-	// ---------- OTHERS ----------
+	// ---------- METHODS ----------
 	
-	public void Sort () // sorting elements in alphabet order
+	/**
+	 * This method sort variables in the disjunct in alphabet order.
+	 * It can be applied to current disjunct.
+	 */
+	public void Sort ()
 	{
 		Collections.sort(variables, new Comparator<ResolutionVariable>()
 		{
@@ -142,7 +154,13 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		});
 	}
 	
-	public void Refresh () // delete duplicate elements
+	/**
+	 * This method set current disjunct "in perfect order":
+	 * it deletes duplicate variables,
+	 * mark the disjunct empty (if there is no variables)
+	 * or make it equal "1" (if there are !variable + variable).
+	 */
+	public void Refresh ()
 	{
 		for (int i = 0; i < variables.size() - 1; i++)
 		{
@@ -159,8 +177,39 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 					variables.removeAll(variables);
 					this.SetOne(true);
 				}
-				/*if ((variables.get(i).GetName().equals(variables.get(j).GetName()))
-						&& variables.get(i).GetDenial() == variables.get(j).GetDenial())
+			}
+		}
+		if (this.GetOne() == false && variables.size() == 0)
+		{
+			this.SetEmpty(true);
+		}
+	}
+	
+	/**
+	 * This method sort predicates in the disjunct in alphabet order.
+	 * It can be applied to current disjunct.
+	 */
+	public void SortPredicate ()
+	{
+		Collections.sort(predicates, new Comparator<ResolutionPredicate>()
+		{
+		    public int compare(ResolutionPredicate v1, ResolutionPredicate v2)
+		    {
+		        return v1.GetName().compareTo(v2.GetName());
+		    }
+		});
+	}
+	
+	/**
+	 * ???
+	 */
+	public void Factorization ()
+	{
+		for (int i = 0; i < variables.size() - 1; i++)
+		{
+			for (int j = i + 1; j < variables.size(); j++)
+			{
+				if (variables.get(i).equals(variables.get(j)))
 				{
 					variables.remove(j);
 					j = j - 1;
@@ -170,7 +219,7 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 				{
 					variables.removeAll(variables);
 					this.SetOne(true);
-				}*/
+				}
 			}
 		}
 		if (this.GetOne() == false && variables.size() == 0)
@@ -185,36 +234,40 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		return 0;
 	}
 	
-	public String toOutputString ()
+	public String toOutputString (int localIndex)
 	{
 		String localOutputStringDisjunct;
-		localOutputStringDisjunct = String.valueOf(id) + ": (" + String.valueOf(parents[0]) + ", " + String.valueOf(parents[1]) + ", " + String.valueOf(contrary) + ") " + this.toString() + "\n";
+		localOutputStringDisjunct = "№" + String.valueOf(localIndex) + " (id " + String.valueOf(id) + ")" + ": (" + String.valueOf(parents[0]) + ", " + String.valueOf(parents[1]) + ", " + String.valueOf(contrary) + ") " + this.toString() + "\n";
 		return localOutputStringDisjunct;
 	}
 	
-	/*public String toOutputString (String lll)
+	public String toOutputStringPredicate (int localIndex)
 	{
-		return "dsds";
-	}*/
+		String localOutputStringDisjunct;
+		localOutputStringDisjunct = "№" + String.valueOf(localIndex) + " (id " + String.valueOf(id) + ")" + ": (" + String.valueOf(parents[0]) + ", " + String.valueOf(parents[1]) + ", " + String.valueOf(contrary) + ") " + this.toStringPredicate() + "\n";
+		return localOutputStringDisjunct;
+	}
 	
 	public String toReadableString ()
 	{
 		String localStringDisjunct = "";
+		String localEmpty = "";
+		String localDenial = "!";
 		if (one == false && empty == false)
 		{
 			int j = 1;
 			for (ResolutionVariable localVariable : variables)
 			{
-				char inverse;
+				String inverse;
 				if (localVariable.GetDenial() == true)
 				{
-					inverse = '\u0000';
+					inverse = localEmpty;
 				}
 				else
 				{
-					inverse = '!';
+					inverse = localDenial;
 				}
-				localStringDisjunct = localStringDisjunct + inverse + "\u0000" + localVariable.GetName();
+				localStringDisjunct = localStringDisjunct + inverse + localVariable.GetName();
 				if (j < variables.size())
 				{
 					localStringDisjunct = localStringDisjunct + " + ";
@@ -234,6 +287,48 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		return localStringDisjunct;
 	}
 	
+	public String toReadableStringPredicate ()
+	{
+		String localStringDisjunct = "";
+		String localLeftBrace = "(";
+		String localRightBrace = ")";
+		String localEmpty = "";
+		String localDenial = "!";
+		if (one == false && empty == false)
+		{
+			int j = 1;
+			for (ResolutionPredicate localPredicate : predicates)
+			{
+				String inverse;
+				if (localPredicate.GetDenial() == true)
+				{
+					inverse = localEmpty;
+				}
+				else
+				{
+					inverse = localDenial;
+				}
+				localStringDisjunct = localStringDisjunct + inverse + localPredicate.GetName();
+				localStringDisjunct = localStringDisjunct + localLeftBrace + ResolutionDisjunct.localToStringPredicate("", localPredicate.GetTerms()) + localRightBrace;
+				if (j < predicates.size())
+				{
+					localStringDisjunct = localStringDisjunct + " + ";
+				}
+				j = j + 1;
+			}
+		}
+		else if (one == true)
+		{
+			localStringDisjunct = localStringDisjunct + "1";
+		}
+		else if (empty == true)
+		{
+			localStringDisjunct = localStringDisjunct + "□";
+		}
+		
+		return localStringDisjunct;
+	}
+	
 	public static String localToStringPredicate (String localLine, ArrayList<ResolutionTerm> localResolutionTerms)
 	{
 		String localLocalLeftBrace = "(";
@@ -243,12 +338,7 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		for (int zhuk = 0; zhuk < localResolutionTerms.size(); zhuk++)
 		{
 			localLine = localLine + localResolutionTerms.get(zhuk).GetName();
-			System.out.println(localResolutionTerms.get(zhuk).GetName());
-			/*if (localResolutionTerms.get(zhuk).GetTerm() != ResolutionTerm.GetFunction())
-			{
-				localLine = localLine + localSplitterComma;
-			}
-			else */if (localResolutionTerms.get(zhuk).GetTerm() == ResolutionTerm.GetFunction())
+			if (localResolutionTerms.get(zhuk).GetTerm() == ResolutionTerm.GetFunction())
 			{
 				localLine = localLine + localLocalLeftBrace + ResolutionDisjunct.localToStringPredicate("", localResolutionTerms.get(zhuk).GetTerms()) + localLocalRightBrace;
 			}
@@ -258,31 +348,33 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 				localLine = localLine + localSplitterComma;
 			}
 		}
+		
 		return localLine;
 	}
 	
 	public String toStringPredicate ()
 	{
+		String localStringDisjunct = "";
 		String localLeftBrace = "(";
 		String localRightBrace = ")";
-		String localStringDisjunct = "";
+		String localEmpty = "";
+		String localDenial = "!";
 		if (one == false && empty == false)
 		{
 			int j = 1;
 			for (ResolutionPredicate localPredicate : predicates)
 			{
-				char inverse;
+				String inverse;
 				if (localPredicate.GetDenial() == true)
 				{
-					inverse = '\u0000';
+					inverse = localEmpty;
 				}
 				else
 				{
-					inverse = '!';
+					inverse = localDenial;
 				}
-				localStringDisjunct = localStringDisjunct + inverse + "\u0000" + localPredicate.GetName();
+				localStringDisjunct = localStringDisjunct + inverse + localPredicate.GetName();
 				localStringDisjunct = localStringDisjunct + localLeftBrace + ResolutionDisjunct.localToStringPredicate("", localPredicate.GetTerms()) + localRightBrace;
-				//System.out.println(localStringDisjunct + " <- Line here");
 				if (j < predicates.size())
 				{
 					localStringDisjunct = localStringDisjunct + " + ";
@@ -298,7 +390,7 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		{
 			localStringDisjunct = localStringDisjunct + "□ (~ false)";
 		}
-
+		
 		return localStringDisjunct;
 	}
 	
@@ -306,21 +398,23 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 	public String toString ()
 	{
 		String localStringDisjunct = "";
+		String localEmpty = "";
+		String localDenial = "!";
 		if (one == false && empty == false)
 		{
 			int j = 1;
 			for (ResolutionVariable localVariable : variables)
 			{
-				char inverse;
+				String inverse;
 				if (localVariable.GetDenial() == true)
 				{
-					inverse = '\u0000';
+					inverse = localEmpty;
 				}
 				else
 				{
-					inverse = '!';
+					inverse = localDenial;
 				}
-				localStringDisjunct = localStringDisjunct + inverse + "\u0000" + localVariable.GetName();
+				localStringDisjunct = localStringDisjunct + inverse + localVariable.GetName();
 				if (j < variables.size())
 				{
 					localStringDisjunct = localStringDisjunct + " + ";

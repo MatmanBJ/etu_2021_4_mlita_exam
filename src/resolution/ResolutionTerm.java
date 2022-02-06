@@ -2,6 +2,15 @@ package resolution;
 
 import java.util.ArrayList;
 
+/**
+ * This class represents terms (constants, variables and functions) for the predicates.
+ * Instead of "classic" statement-logic variables they can't have "denial",
+ * but they can have term type (constants, variables and functions) and terms list (only for functions).
+ * Terms [instead of predicates and "classic" statement-logic variables] in the predicate (and in the functions) can't change their place.
+ * @author MatmanBJ
+ * @version alpha 0.18
+ * @since alpha 0.18
+ */
 public class ResolutionTerm
 {
 	// -------------------------------
@@ -91,6 +100,58 @@ public class ResolutionTerm
 	}
 	
 	// ---------- METHODS ----------
+	
+	// 1 -- DORABOTAT ETU FUNCCIJU (var-var, var-const, const-var // func-func(easily with cycle) // func-var (with no name check))
+	// 2 -- REALIOVAT POLNYJ VVOD I VYVOD PREDICATOV
+	// 3 -- REALIZOVAL FUNKCIJU I UNIFIKACIJU
+	// 4 -- REALIZOVAT LINEJNUJU REZOLUCIJU
+	
+	public boolean pseudoEquals (Object localObject)
+	{
+		ResolutionTerm localTerm = (ResolutionTerm) localObject;
+		boolean localEquality = true;
+		if ((this.GetName().equals(localTerm.GetName())) && (this.GetTerms().size() == localTerm.GetTerms().size()))
+		{
+			for (int z = 0; z < localTerm.GetTerms().size(); z++)
+			{
+				boolean localEkwality = this.GetTerms().get(z).pseudoEquals(localTerm.GetTerms().get(z));
+				if (!localEkwality)
+				{
+					localEquality = localEkwality;
+					z = localTerm.GetTerms().size();
+				}
+			}
+		}
+		else
+		{
+			localEquality = false;
+		}
+		return localEquality;
+	}
+	
+	@Override
+	public boolean equals (Object localObject)
+	{
+		ResolutionTerm localTerm = (ResolutionTerm) localObject;
+		boolean localEquality = true;
+		if ((this.GetName().equals(localTerm.GetName())) && (this.GetTerms().size() == localTerm.GetTerms().size()) && (this.GetTerm().equals(localTerm.GetTerm())))
+		{
+			for (int z = 0; z < localTerm.GetTerms().size(); z++)
+			{
+				boolean localEkwality = this.GetTerms().get(z).equals(localTerm.GetTerms().get(z));
+				if (!localEkwality)
+				{
+					localEquality = localEkwality;
+					z = localTerm.GetTerms().size();
+				}
+			}
+		}
+		else
+		{
+			localEquality = false;
+		}
+		return localEquality;
+	}
 	
 	public static boolean isConstant (String localString)
 	{
