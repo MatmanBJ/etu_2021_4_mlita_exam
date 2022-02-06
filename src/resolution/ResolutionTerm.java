@@ -8,7 +8,7 @@ public class ResolutionTerm
 	// ---------- VARIABLES ----------
 	// -------------------------------
 	
-	enum termType
+	private enum termType
 	{
 		variable, constant, function
 	};
@@ -53,6 +53,18 @@ public class ResolutionTerm
 	
 	// ---------- GETTERS ----------
 	
+	public static termType GetVariable ()
+	{
+		return termType.variable;
+	}
+	public static termType GetConstant ()
+	{
+		return termType.constant;
+	}
+	public static termType GetFunction ()
+	{
+		return termType.function;
+	}
 	public static int GetID ()
 	{
 		return id;
@@ -76,5 +88,147 @@ public class ResolutionTerm
 	public ArrayList<ResolutionTerm> GetTerms ()
 	{
 		return terms;
+	}
+	
+	// ---------- METHODS ----------
+	
+	public static boolean isConstant (String localString)
+	{
+		boolean localConstant = false;
+		for (int m = 0; m < localString.length(); m++)
+		{
+			if (greekAlphabet.contentEquals(String.valueOf(localString.charAt(m))))
+			{
+				localConstant = true;
+			}
+		}
+		return localConstant;
+	}
+	
+	public static void newFunction (String localPredicateString, ResolutionTerm localElement)
+	{
+		int localJ = 0;
+		String localName;
+		while (localJ < localPredicateString.length())
+		{
+			localName = "";
+			while (localJ < localPredicateString.length())
+			{
+				if ((localPredicateString.charAt(localJ) != '(') && (localPredicateString.charAt(localJ) != ')') && (localPredicateString.charAt(localJ) != ',') && (localPredicateString.charAt(localJ) != ';'))
+				{
+					//System.out.println(localPredicateString.charAt(localJ));
+					//System.out.println(localPredicateString + String.valueOf(localJ));
+					localName = localName.concat(String.valueOf(localPredicateString.charAt(localJ)));
+					System.out.println(String.valueOf(localPredicateString.charAt(localJ)));
+					System.out.println(localName);
+					localJ = localJ + 1;
+				}
+				else
+				{
+					break;
+				}
+			}
+			if (localJ < localPredicateString.length() && localPredicateString.charAt(localJ) == '(')
+			{
+				ResolutionTerm localTerm = new ResolutionTerm(ResolutionTerm.GetFunction(), localName);
+				localElement.SetTerms(localTerm);
+				int localBalance = 0;
+				int n = 0;
+				do {
+					if (localPredicateString.charAt(localJ + n) == '(')
+					{
+						localBalance = localBalance - 1;
+					}
+					else if (localPredicateString.charAt(localJ + n) == ')')
+					{
+						localBalance = localBalance + 1;
+					}
+					n = n + 1;
+				} while (localBalance != 0);
+				int localIndex = localJ + n - 1;
+				if (localJ + 1 != localIndex)
+				{
+					ResolutionTerm.newFunction(localPredicateString.substring(localJ + 1, localIndex), localTerm);
+				}
+				else
+				{
+					ResolutionTerm.newFunction("", localTerm);
+				}
+				localJ = localIndex + 1;
+			}
+			else if (ResolutionTerm.isConstant(localName))
+			{
+				localElement.SetTerms(new ResolutionTerm(ResolutionTerm.GetConstant(), localName));
+			}
+			else
+			{
+				localElement.SetTerms(new ResolutionTerm(ResolutionTerm.GetVariable(), localName));
+			}
+			localJ = localJ + 1;
+		}
+	}
+	
+	public static void newFunction (String localPredicateString, ResolutionPredicate localElement)
+	{
+		int localJ = 0;
+		String localName;
+		while (localJ < localPredicateString.length())
+		{
+			localName = "";
+			while (localJ < localPredicateString.length())
+			{
+				if ((localPredicateString.charAt(localJ) != '(') && (localPredicateString.charAt(localJ) != ')') && (localPredicateString.charAt(localJ) != ',') && (localPredicateString.charAt(localJ) != ';'))
+				{
+					//System.out.println(localPredicateString.charAt(localJ));
+					//System.out.println(localPredicateString + String.valueOf(localJ));
+					localName = localName.concat(String.valueOf(localPredicateString.charAt(localJ)));
+					System.out.println(String.valueOf(localPredicateString.charAt(localJ)));
+					System.out.println(localName);
+					localJ = localJ + 1;
+				}
+				else
+				{
+					break;
+				}
+			}
+			if (localJ < localPredicateString.length() && localPredicateString.charAt(localJ) == '(')
+			{
+				//System.out.println("Function???");
+				ResolutionTerm localTerm = new ResolutionTerm(ResolutionTerm.GetFunction(), localName);
+				localElement.SetTerms(localTerm);
+				int localBalance = 0;
+				int n = 0;
+				do {
+					if (localPredicateString.charAt(localJ + n) == '(')
+					{
+						localBalance = localBalance - 1;
+					}
+					else if (localPredicateString.charAt(localJ + n) == ')')
+					{
+						localBalance = localBalance + 1;
+					}
+					n = n + 1;
+				} while (localBalance != 0);
+				int localIndex = localJ + n - 1;
+				if (localJ + 1 != localIndex)
+				{
+					ResolutionTerm.newFunction(localPredicateString.substring(localJ + 1, localIndex), localTerm);
+				}
+				else
+				{
+					ResolutionTerm.newFunction("", localTerm);
+				}
+				localJ = localIndex + 1;
+			}
+			else if (ResolutionTerm.isConstant(localName))
+			{
+				localElement.SetTerms(new ResolutionTerm(ResolutionTerm.GetConstant(), localName));
+			}
+			else
+			{
+				localElement.SetTerms(new ResolutionTerm(ResolutionTerm.GetVariable(), localName));
+			}
+			localJ = localJ + 1;
+		}
 	}
 }

@@ -1,9 +1,8 @@
 // Alternative exam -- 4 term
 // Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.17
+// Resolution method version alpha 0.18
 // Updates:
-// -- Output algorithm updated (using overload functions)
-// -- Input from console and file algorithm updated ("1" and "□" reading added)
+// -- Full predicate input added
 
 package resolution;
 
@@ -274,6 +273,7 @@ public class ResolutionMethod
 		
 		Scanner inputScanner = new Scanner(System.in);
 		int key = 1;
+		String typeLogic;
 		String typeInput;
 		String typeOutput;
 		String typeTreatment;
@@ -286,6 +286,8 @@ public class ResolutionMethod
 			
 			ResolutionDisjunct.SetMaxID();
 			
+			System.out.println("Please write type of logic (<type>):");
+			typeLogic = inputScanner.nextLine();
 			System.out.println("Please write type of input (<type>):");
 			typeInput = inputScanner.nextLine();
 			System.out.println("Please write type of treatment (<type>):");
@@ -293,11 +295,22 @@ public class ResolutionMethod
 			System.out.println("Please write type of output (<type 1> or <type 1> <type 2> or all):");
 			typeOutput = inputScanner.nextLine();
 			
-			localFunction = InputMain(typeInput);
-			localFunction = TreatmentMain(typeTreatment, localFunction);
-			//localFunction.ResolutionHash();
-			//localFunction.ResolutionAllUnique();
-			OutputMain(localFunction, typeOutput);
+			if (typeLogic.equals("statement"))
+			{
+				localFunction = InputMain(typeInput);
+				localFunction = TreatmentMain(typeTreatment, localFunction);
+				//localFunction.ResolutionHash();
+				//localFunction.ResolutionAllUnique();
+				OutputMain(localFunction, typeOutput);
+			}
+			else if (typeLogic.equals("predicate"))
+			{
+				ResolutionFunction test = new ResolutionFunction(111);
+			}
+			else
+			{
+				System.out.println("Incorrect type of logic! Default input from console");
+			}
 			
 			System.out.println("Do you want to input something else? Press 0 to NO, press else to YES:");
 			key = inputScanner.nextInt();

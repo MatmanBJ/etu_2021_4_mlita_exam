@@ -50,6 +50,18 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		contrary = "0";
 	}
 	
+	public ResolutionDisjunct (ArrayList<ResolutionPredicate> localResolutionPredicate, int localInt) // special constructor
+	{
+		one = false;
+		empty = false;
+		predicates.addAll(localResolutionPredicate);
+		id = maxID + 1;
+		maxID = maxID + 1;
+		parents[0] = 0;
+		parents[1] = 0;
+		contrary = "0";
+	}
+	
 	// ---------- SETTERS ----------
 	
 	public void SetOne (boolean localOne)
@@ -217,6 +229,74 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		else if (empty == true)
 		{
 			localStringDisjunct = localStringDisjunct + "□";
+		}
+
+		return localStringDisjunct;
+	}
+	
+	public static String localToStringPredicate (String localLine, ArrayList<ResolutionTerm> localResolutionTerms)
+	{
+		String localLocalLeftBrace = "(";
+		String localLocalRightBrace = ")";
+		String localSplitterComma = ",";
+		String localSplitterDotComma = ";";
+		for (int zhuk = 0; zhuk < localResolutionTerms.size(); zhuk++)
+		{
+			localLine = localLine + localResolutionTerms.get(zhuk).GetName();
+			System.out.println(localResolutionTerms.get(zhuk).GetName());
+			/*if (localResolutionTerms.get(zhuk).GetTerm() != ResolutionTerm.GetFunction())
+			{
+				localLine = localLine + localSplitterComma;
+			}
+			else */if (localResolutionTerms.get(zhuk).GetTerm() == ResolutionTerm.GetFunction())
+			{
+				localLine = localLine + localLocalLeftBrace + ResolutionDisjunct.localToStringPredicate("", localResolutionTerms.get(zhuk).GetTerms()) + localLocalRightBrace;
+			}
+			
+			if (zhuk < localResolutionTerms.size() - 1)
+			{
+				localLine = localLine + localSplitterComma;
+			}
+		}
+		return localLine;
+	}
+	
+	public String toStringPredicate ()
+	{
+		String localLeftBrace = "(";
+		String localRightBrace = ")";
+		String localStringDisjunct = "";
+		if (one == false && empty == false)
+		{
+			int j = 1;
+			for (ResolutionPredicate localPredicate : predicates)
+			{
+				char inverse;
+				if (localPredicate.GetDenial() == true)
+				{
+					inverse = '\u0000';
+				}
+				else
+				{
+					inverse = '!';
+				}
+				localStringDisjunct = localStringDisjunct + inverse + "\u0000" + localPredicate.GetName();
+				localStringDisjunct = localStringDisjunct + localLeftBrace + ResolutionDisjunct.localToStringPredicate("", localPredicate.GetTerms()) + localRightBrace;
+				//System.out.println(localStringDisjunct + " <- Line here");
+				if (j < predicates.size())
+				{
+					localStringDisjunct = localStringDisjunct + " + ";
+				}
+				j = j + 1;
+			}
+		}
+		else if (one == true)
+		{
+			localStringDisjunct = localStringDisjunct + "1 (~ true)";
+		}
+		else if (empty == true)
+		{
+			localStringDisjunct = localStringDisjunct + "□ (~ false)";
 		}
 
 		return localStringDisjunct;
