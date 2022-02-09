@@ -14,7 +14,7 @@ import java.lang.Object.*;
  * By default, it is commonly prepared for the resolution.
  * A function contains a list with disjuncts.
  * @author MatmanBJ
- * @version alpha 0.25
+ * @version alpha 0.27
  */
 public class ResolutionFunction
 {
@@ -1446,6 +1446,313 @@ public class ResolutionFunction
 				disjuncts.addAll(localF.GetDisjuncts());
 				this.RefreshExtension(d); // it's only here, because at the end it doesn't work
 			}
+		}
+	}
+	
+	// ---------- A GIANT OF THOUHT, A FATHER OF RUSSIAN RES(V)OLUTION ----------
+	
+	class Interpretation
+	{
+		private String name;
+		private boolean denial;
+		
+		Interpretation ()
+		{}
+		
+		Interpretation (String localName)
+		{
+			name = new String(localName);
+			denial = false;
+		}
+		
+		public void SetName (String localName)
+		{
+			name = new String(localName);
+		}
+		public void SetDenial (boolean localDenial)
+		{
+			denial = localDenial;
+		}
+		public String GetName ()
+		{
+			return name;
+		}
+		public boolean GetDenial ()
+		{
+			return denial;
+		}
+	}
+	
+	/**
+	 * [DEMONSTRATION]
+	 * @author MatmanBJ
+	 */
+	public void ResolutionSemantic ()
+	{
+		int i;
+		int j;
+		int k;
+		int l;
+		int c;
+		
+		int c1 = 0;
+		int c2 = 0;
+		int c3 = 0;
+		int c4 = 0;
+		boolean repeat = true;
+		boolean stop = false;
+		
+		//ArrayList<ResolutionDisjunct> localTrue = new ArrayList<ResolutionDisjunct>();
+		//ArrayList<ResolutionDisjunct> localFalse = new ArrayList<ResolutionDisjunct>();
+		/*ArrayList<Interpretation> localInterpretation = new ArrayList<Interpretation>();
+		
+		for (ResolutionDisjunct p : disjuncts)
+		{
+			for (ResolutionVariable q : p.GetVariables())
+			{
+				if (localInterpretation.contains(q.GetName()) == false)
+				{
+					localInterpretation.add(new Interpretation(q.GetName()));
+				}
+			}
+		}*/
+		
+		ArrayList<String> localInterpretation = new ArrayList<String>(); // only "true" interpretation
+		for (ResolutionDisjunct p : disjuncts)
+		{
+			for (ResolutionVariable q : p.GetVariables())
+			{
+				if (localInterpretation.contains(q.GetName()) == false)
+				{
+					localInterpretation.add(new String(q.GetName()));
+				}
+			}
+		}
+		
+		this.SortD();
+		this.RefreshD();
+		ResolutionFunction localTrue = new ResolutionFunction();
+		ResolutionFunction localFalse = new ResolutionFunction();
+		
+		ResolutionFunction localF = new ResolutionFunction();
+		localF.GetDisjuncts().addAll(disjuncts);
+		disjuncts.removeAll(disjuncts);
+		
+		System.out.println("+---------------------------------------+---------------------------------------+");
+		System.out.format("|%-39s|%-39s|", "TRUE INTERPRETATION", "FALSE INTERPRETATION");
+		System.out.println("\n+---------------------------------------+---------------------------------------+");
+		
+		int iter = 1;
+		
+		while (repeat == true)
+		{
+			ResolutionFunction localLocalTrue = new ResolutionFunction();
+			ResolutionFunction localLocalFalse = new ResolutionFunction();
+			ResolutionFunction localFR = new ResolutionFunction();
+			int d = disjuncts.size();
+			
+			for (i = 0; i < localF.GetDisjuncts().size(); i++)
+			{
+				boolean localAdd = false;
+				for (ResolutionVariable s : localF.GetDisjuncts().get(i).GetVariables())
+				{
+					if ((localInterpretation.contains(s.GetName()) == true) && (s.GetDenial() == true))
+					{
+						localAdd = true;
+					}
+					else if ((localInterpretation.contains(s.GetName()) == false) && (s.GetDenial() == false))
+					{
+						localAdd = true;
+					}
+				}
+				if (localAdd == true)
+				{
+					localTrue.GetDisjuncts().add(localF.GetDisjuncts().get(i));
+				}
+				else // if (localAdd == false)
+				{
+					localFalse.GetDisjuncts().add(localF.GetDisjuncts().get(i));
+				}
+			}
+			System.out.println("+---------------------------------------+---------------------------------------+");
+			System.out.format("|%-79s|", "ITERATION " + iter);
+			System.out.println("\n+---------------------------------------+---------------------------------------+");
+			iter = iter + 1;
+			localTrue.Refresh();
+			localFalse.Refresh();
+			//System.out.format("%32s %10d %16s", "hhh", 22, "dd");
+			int c5;
+			int c6;
+			if (localTrue.GetDisjuncts().size() - c3 > localFalse.GetDisjuncts().size() - c4)
+			{
+				c5 = c1;
+				//c5 = c3;
+				c6 = localTrue.GetDisjuncts().size();
+			}
+			else
+			{
+				//c5 = c4;
+				c5 = c2;
+				c6 = localFalse.GetDisjuncts().size();
+			}
+			int ind1 = c1;
+			int ind2 = c2;
+			//int ind1 = c3;
+			//int ind2 = c4;
+			for (i = c5; i < c6; i++)
+			{
+				/*if (ind1 >= localTrue.GetDisjuncts().size() && ind2 >= localFalse.GetDisjuncts().size())
+				{
+					
+				}*/
+				if (ind1 >= localTrue.GetDisjuncts().size())
+				{
+					System.out.format("|%-39s|%-39s|", "", localFalse.GetDisjuncts().get(ind2).toOutputStringOnly(ind2 + 1));
+				}
+				else if (ind2 >= localFalse.GetDisjuncts().size())
+				{
+					System.out.format("|%-39s|%-39s|", localTrue.GetDisjuncts().get(ind1).toOutputStringOnly(ind1 + 1), "");
+				}
+				else
+				{
+					System.out.format("|%-39s|%-39s|", localTrue.GetDisjuncts().get(ind1).toOutputStringOnly(ind1 + 1), localFalse.GetDisjuncts().get(ind2).toOutputStringOnly(ind2 + 1));
+				}
+				ind1 = ind1 + 1;
+				ind2 = ind2 + 1;
+				if (i + 1 != c6)
+				{
+					System.out.println("\n|---------------------------------------|---------------------------------------|");
+				}
+				else
+				{
+					System.out.print("\n");
+				}
+			}
+			//System.out.format("%32s %10d %16s", "hhh", 22, "dd");
+			//System.out.println("+---------------------------------------+---------------------------------------+");
+			////System.out.println("TRUE");
+			////localTrue.GetFunction();
+			////System.out.println("FALSE");
+			////localFalse.GetFunction();
+			//localF.Refresh();
+			//disjuncts.addAll(localF.GetDisjuncts());
+
+			//this.Refresh(); // it's only here, because at the end it doesn't work
+			for (i = 0; i < localTrue.GetDisjuncts().size(); i++)
+			{
+				ResolutionDisjunct localDisjunct = localTrue.GetDisjuncts().get(i);
+				ArrayList<ResolutionVariable> variables = localDisjunct.GetVariables();
+				/*if (i < d)
+				{
+					c = d;
+				}
+				else
+				{
+					c = i + 1;
+				}*/
+				for (j = c2; j < localFalse.GetDisjuncts().size(); j++)
+				{
+					ResolutionDisjunct localDisjunctTwo = localFalse.GetDisjuncts().get(j);
+					ArrayList<ResolutionVariable> variablesTwo = localDisjunctTwo.GetVariables();
+					for (k = 0; k < variables.size(); k++)
+					{
+						ResolutionVariable localVariable = variables.get(k);
+						for (l = 0; l < variablesTwo.size(); l++)
+						{
+							ResolutionVariable localVariableTwo = variablesTwo.get(l);
+							if ((localVariable.GetName().equals(localVariableTwo.GetName())) && (localVariable.GetDenial() != localVariableTwo.GetDenial()))
+							{
+								ResolutionDisjunct localNewDisjunct = new ResolutionDisjunct();
+								
+								localNewDisjunct.GetVariables().addAll(localDisjunct.GetVariables());
+								ResolutionVariable x = localNewDisjunct.GetVariables().get(k);
+								localNewDisjunct.GetVariables().remove(x);
+								
+								localNewDisjunct.GetVariables().addAll(localDisjunctTwo.GetVariables());
+								ResolutionVariable y = localNewDisjunct.GetVariables().get(localDisjunct.GetVariables().size() - 1 + l);
+								localNewDisjunct.GetVariables().remove(y);
+								int [] localParents = {localDisjunct.GetID(), localDisjunctTwo.GetID()}; // create parent's numbers array
+								localNewDisjunct.SetParents(localParents); // set parent's numbers
+								
+								localNewDisjunct.SetContrary(String.valueOf(localVariable.GetName())); // set parent's contrary variable
+								
+								localNewDisjunct.Refresh();
+								localNewDisjunct.Sort();
+								
+								if (localNewDisjunct.GetEmpty() == true)
+								{
+									stop = true;
+								}
+								
+								localFR.SetDisjuncts(localNewDisjunct);
+							}
+						}
+					}
+				}
+			}
+			for (i = c1; i < localTrue.GetDisjuncts().size(); i++)
+			{
+				ResolutionDisjunct localDisjunct = localTrue.GetDisjuncts().get(i);
+				ArrayList<ResolutionVariable> variables = localDisjunct.GetVariables();
+				/*if (i < d)
+				{
+					c = d;
+				}
+				else
+				{
+					c = i + 1;
+				}*/
+				for (j = 0; j < localFalse.GetDisjuncts().size(); j++)
+				{
+					ResolutionDisjunct localDisjunctTwo = localFalse.GetDisjuncts().get(j);
+					ArrayList<ResolutionVariable> variablesTwo = localDisjunctTwo.GetVariables();
+					for (k = 0; k < variables.size(); k++)
+					{
+						ResolutionVariable localVariable = variables.get(k);
+						for (l = 0; l < variablesTwo.size(); l++)
+						{
+							ResolutionVariable localVariableTwo = variablesTwo.get(l);
+							if ((localVariable.GetName().equals(localVariableTwo.GetName())) && (localVariable.GetDenial() != localVariableTwo.GetDenial()))
+							{
+								ResolutionDisjunct localNewDisjunct = new ResolutionDisjunct();
+								
+								localNewDisjunct.GetVariables().addAll(localDisjunct.GetVariables());
+								ResolutionVariable x = localNewDisjunct.GetVariables().get(k);
+								localNewDisjunct.GetVariables().remove(x);
+								
+								localNewDisjunct.GetVariables().addAll(localDisjunctTwo.GetVariables());
+								ResolutionVariable y = localNewDisjunct.GetVariables().get(localDisjunct.GetVariables().size() - 1 + l);
+								localNewDisjunct.GetVariables().remove(y);
+								int [] localParents = {localDisjunct.GetID(), localDisjunctTwo.GetID()}; // create parent's numbers array
+								localNewDisjunct.SetParents(localParents); // set parent's numbers
+								
+								localNewDisjunct.SetContrary(String.valueOf(localVariable.GetName())); // set parent's contrary variable
+								
+								localNewDisjunct.Refresh();
+								localNewDisjunct.Sort();
+								
+								if (localNewDisjunct.GetEmpty() == true)
+								{
+									stop = true;
+								}
+								
+								localFR.SetDisjuncts(localNewDisjunct);
+							}
+						}
+					}
+				}
+			}
+			c3 = c1;
+			c4 = c2;
+			c1 = localTrue.GetDisjuncts().size();
+			c2 = localFalse.GetDisjuncts().size();
+			if(localFR.GetDisjuncts().size() == 0)
+			{
+				repeat = false;
+				disjuncts.addAll(localTrue.GetDisjuncts());
+				disjuncts.addAll(localFalse.GetDisjuncts());
+			}
+			localF = localFR;
 		}
 	}
 	

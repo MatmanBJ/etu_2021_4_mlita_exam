@@ -15,7 +15,7 @@ import java.util.HashSet;
 /**
  * Main class "ResolutionMethod"
  * @author MatmanBJ
- * @version alpha 0.25
+ * @version alpha 0.27
  */
 public class ResolutionMethod
 {
@@ -407,6 +407,7 @@ public class ResolutionMethod
 			if (typeLogic.equals("statement"))
 			{
 				localFunction = InputMain(typeInput);
+				localFunction.ResolutionSemantic();
 				localFunction = TreatmentMain(typeTreatment, localFunction);
 				OutputMain(localFunction, typeOutput);
 			}
