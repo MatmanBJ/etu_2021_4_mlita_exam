@@ -14,7 +14,7 @@ import java.lang.Object.*;
  * By default, it is commonly prepared for the resolution.
  * A function contains a list with disjuncts.
  * @author MatmanBJ
- * @version alpha 0.23
+ * @version alpha 0.24
  */
 public class ResolutionFunction
 {
@@ -161,11 +161,7 @@ public class ResolutionFunction
 			localInputDisjunct.SetOne(localOne);
 			
 			disjuncts.add(localInputDisjunct);
-			
-			ResolutionDisjunct localDisjunct = disjuncts.get(disjuncts.size() - 1);
-			ArrayList<ResolutionPredicate> variables = localDisjunct.GetPredicates();
-			System.out.print("Input " + i + ": ");
-			System.out.println(localDisjunct.toStringPredicate());
+			this.GetOneDisjunctPredicate(i + 1);
 
 		}
 		//this.RefreshD();
@@ -479,7 +475,67 @@ public class ResolutionFunction
 		}
 	}
 	
-	public void RefreshExtensionPredicateTest (int localSize)
+	public void RefreshExtensionPredicatePseudo (int localSize)
+	{
+		for (int i = 0; i < localSize; i++)
+		{
+			for (int j = localSize; j < disjuncts.size(); j++)
+			{
+				boolean ekwality = true;
+				if ((disjuncts.get(i).GetOne() == disjuncts.get(j).GetOne())
+						&& (disjuncts.get(i).GetEmpty() == disjuncts.get(j).GetEmpty()))
+				{
+					int localMaxSize = 0;
+					if (disjuncts.get(i).GetPredicates().size() <= disjuncts.get(j).GetPredicates().size())
+					{
+						localMaxSize = disjuncts.get(i).GetPredicates().size();
+					}
+					else
+					{
+						ekwality = false;
+					}
+					// we have two situations: the last (j) disjunct should be less or equal to current (i)
+					// disjunct -- so that we can delete him, else it would be unnesessary and wrong
+					// because we should prevent expansion instead of giving a "chance" to the new disjunct!!!
+					for (int k = 0; k < localMaxSize; k++)
+					{
+						boolean localEkwality = false;
+						for (int l = 0; l < disjuncts.get(j).GetPredicates().size(); l++)
+						{
+							if ((disjuncts.get(i).GetPredicates().get(k).pseudoEquals(disjuncts.get(j).GetPredicates().get(l))) // don't forget "!"
+									&&
+									(disjuncts.get(i).GetPredicates().get(k).GetDenial() ==
+									disjuncts.get(j).GetPredicates().get(l).GetDenial()))
+							{
+								//System.out.println((i + 1) + " " + (j + 1) + " " + (k + 1) + " " + (l + 1));
+								localEkwality = true;
+							}
+						}
+						if (localEkwality == false)
+						{
+							ekwality = false;
+						}
+					}
+				}
+				else
+				{
+					ekwality = false;
+				}
+				if (ekwality == true)
+				{
+					disjuncts.remove(j);
+					j = j - 1;
+				}
+				else if (disjuncts.get(j).GetOne() == true)
+				{
+					disjuncts.remove(j);
+					j = j - 1;
+				}
+			}
+		}
+	}
+	
+	public void RefreshExtensionPredicateSize (int localSize)
 	{
 		for (int i = 0; i < localSize; i++)
 		{
@@ -545,9 +601,15 @@ public class ResolutionFunction
 	public void GetOneDisjunct (int localI) // for console-constructor
 	{
 		ResolutionDisjunct localDisjunct = disjuncts.get(disjuncts.size() - 1);
-		ArrayList<ResolutionVariable> variables = localDisjunct.GetVariables();
 		System.out.print("Input " + localI + ": ");
 		System.out.println(localDisjunct.toString());
+	}
+	
+	public void GetOneDisjunctPredicate (int localI) // for console-constructor
+	{
+		ResolutionDisjunct localDisjunct = disjuncts.get(disjuncts.size() - 1);
+		System.out.print("Input " + localI + ": ");
+		System.out.println(localDisjunct.toStringPredicate());
 	}
 	
 	/**
@@ -733,7 +795,16 @@ public class ResolutionFunction
         }
 	}
 	
-	public ResolutionFunction Resolution ()
+	/**
+	 * [DEMONSTRATION]
+	 * Parameter for console: "all".
+	 * This method makes all possible disjuncts.
+	 * Then it stops, when new ArrayList of disjuncts is empty.
+	 * The method will work until an empty disjunct will be found (doesn't matter if it has found an empty one).
+	 * WARNING: IT MAY NOT STOP!
+	 * @author MatmanBJ
+	 */
+	public ResolutionFunction ResolutionAll ()
 	{
 		int i;
 		int j;
@@ -742,45 +813,8 @@ public class ResolutionFunction
 		int c;
 		boolean repeat = true;
 		ResolutionFunction localF = new ResolutionFunction();
-		for (i = 0; i < disjuncts.size() - 1; i++)
-		{
-			ResolutionDisjunct localDisjunct = disjuncts.get(i);
-			ArrayList<ResolutionVariable> variables = localDisjunct.GetVariables();
-			for (j = i + 1; j < disjuncts.size(); j++)
-			{
-				ResolutionDisjunct localDisjunctTwo = disjuncts.get(j);
-				ArrayList<ResolutionVariable> variablesTwo = localDisjunctTwo.GetVariables();
-				for (k = 0; k < variables.size(); k++)
-				{
-					ResolutionVariable localVariable = variables.get(k);
-					for (l = 0; l < variablesTwo.size(); l++)
-					{
-						ResolutionVariable localVariableTwo = variablesTwo.get(l);
-						if ((localVariable.GetName().equals(localVariableTwo.GetName())) && (localVariable.GetDenial() != localVariableTwo.GetDenial()))
-						{
-							ResolutionDisjunct localNewDisjunct = new ResolutionDisjunct();
-							
-							localNewDisjunct.GetVariables().addAll(localDisjunct.GetVariables());
-							ResolutionVariable x = localNewDisjunct.GetVariables().get(k);
-							localNewDisjunct.GetVariables().remove(x);
-							
-							localNewDisjunct.GetVariables().addAll(localDisjunctTwo.GetVariables());
-							ResolutionVariable y = localNewDisjunct.GetVariables().get(localDisjunct.GetVariables().size() - 1 + l);
-							localNewDisjunct.GetVariables().remove(y);
-							int [] localParents = {localDisjunct.GetID(), localDisjunctTwo.GetID()};
-							localNewDisjunct.SetParents(localParents);
-							
-							localNewDisjunct.SetContrary(String.valueOf(localVariable.GetName()));
-							
-							localNewDisjunct.Refresh();
-							localNewDisjunct.Sort();
-							
-							localF.SetDisjuncts(localNewDisjunct);
-						}
-					}
-				}
-			}
-		}
+		localF.GetDisjuncts().addAll(disjuncts);
+		disjuncts.removeAll(disjuncts);
 		while (repeat == true)
 		{
 			ResolutionFunction localFR = new ResolutionFunction();
@@ -842,7 +876,16 @@ public class ResolutionFunction
 		return localF;
 	}
 	
-	public void ResolutionFind ()
+	/**
+	 * [DEMONSTRATION]
+	 * Parameter for console: "all find".
+	 * This method makes all possible disjuncts until it will find an empty one.
+	 * Then it stops (breaks) all the loops.
+	 * The method will work until an empty disjunct will be found or all possible disjuncts will be found.
+	 * WARNING: IT MAY NOT STOP!
+	 * @author MatmanBJ
+	 */
+	public void ResolutionAllFind ()
 	{
 		int i;
 		int j;
@@ -851,71 +894,8 @@ public class ResolutionFunction
 		int c;
 		boolean repeat = true;
 		ResolutionFunction localF = new ResolutionFunction();
-		for (i = 0; i < disjuncts.size() - 1; i++)
-		{
-			if (repeat == false)
-			{
-				break;
-			}
-			ResolutionDisjunct localDisjunct = disjuncts.get(i);
-			ArrayList<ResolutionVariable> variables = localDisjunct.GetVariables();
-			for (j = i + 1; j < disjuncts.size(); j++)
-			{
-				if (repeat == false)
-				{
-					break;
-				}
-				ResolutionDisjunct localDisjunctTwo = disjuncts.get(j);
-				ArrayList<ResolutionVariable> variablesTwo = localDisjunctTwo.GetVariables();
-				for (k = 0; k < variables.size(); k++)
-				{
-					if (repeat == false)
-					{
-						break;
-					}
-					ResolutionVariable localVariable = variables.get(k);
-					for (l = 0; l < variablesTwo.size(); l++)
-					{
-						if (repeat == false)
-						{
-							break;
-						}
-						ResolutionVariable localVariableTwo = variablesTwo.get(l);
-						if ((localVariable.GetName().equals(localVariableTwo.GetName())) && (localVariable.GetDenial() != localVariableTwo.GetDenial()))
-						{
-							ResolutionDisjunct localNewDisjunct = new ResolutionDisjunct();
-							
-							localNewDisjunct.GetVariables().addAll(localDisjunct.GetVariables());
-							ResolutionVariable x = localNewDisjunct.GetVariables().get(k);
-							localNewDisjunct.GetVariables().remove(x);
-							
-							localNewDisjunct.GetVariables().addAll(localDisjunctTwo.GetVariables());
-							ResolutionVariable y = localNewDisjunct.GetVariables().get(localDisjunct.GetVariables().size() - 1 + l);
-							localNewDisjunct.GetVariables().remove(y);
-							int [] localParents = {localDisjunct.GetID(), localDisjunctTwo.GetID()};
-							localNewDisjunct.SetParents(localParents);
-							
-							localNewDisjunct.SetContrary(String.valueOf(localVariable.GetName()));
-							
-							localNewDisjunct.Refresh();
-							localNewDisjunct.Sort();
-							
-							if (localNewDisjunct.GetOne() == false && localNewDisjunct.GetVariables().size() == 0)
-							{
-								localNewDisjunct.SetEmpty(true);
-								repeat = false;
-							}
-							localF.SetDisjuncts(localNewDisjunct);
-						}
-					}
-				}
-			}
-		}
-		if (repeat == false)
-		{
-			disjuncts.addAll(localF.GetDisjuncts());
-			System.out.println("The □ has been found (DONE)!!!");
-		}
+		localF.GetDisjuncts().addAll(disjuncts);
+		disjuncts.removeAll(disjuncts);
 		while (repeat == true)
 		{
 			ResolutionFunction localFR = new ResolutionFunction();
@@ -992,12 +972,12 @@ public class ResolutionFunction
 			if (repeat == false)
 			{
 				disjuncts.addAll(localFR.GetDisjuncts());
-				System.out.println("The □ has been found (DONE)!!!");
+				//System.out.println("The □ has been found (DONE)!!!");
 			}
 			if(localFR.GetDisjuncts().size() == 0)
 			{
 				repeat = false;
-				System.out.println("The □ hasn't been found (NOT DONE)!!!");
+				//System.out.println("The □ hasn't been found (NOT DONE)!!!");
 			}
 			localF = localFR;
 		}
@@ -1010,6 +990,7 @@ public class ResolutionFunction
 	// ---------- A GIANT OF THOUHT, A FATHER OF RUSSIAN RES(V)OLUTION ----------
 	
 	/**
+	 * [DEMONSTRATION]
 	 * Parameter for console: "unique".
 	 * This method makes all possible, but unique disjuncts
 	 * (first gotten disjunct is new unique, other will be deleted).
@@ -1098,7 +1079,6 @@ public class ResolutionFunction
 	// ---------- SATURATION STRATEGY ----------
 	
 	/**
-	 * [DEMONSTRATION]
 	 * Parameter for console: "saturation".
 	 * This method makes all possible disjuncts (it doesn't delete them)
 	 * until it doesn't find empty disjunct. It's a very long and unoptimized method for big data,
@@ -1203,7 +1183,6 @@ public class ResolutionFunction
 	// ---------- PREFERENCE STRATEGY ----------
 	
 	/**
-	 * [DEMONSTRATION]
 	 * Parameter for console: "preference".
 	 * This method makes all possible disjuncts (it doesn't delete them),
 	 * but it starts from short and ends at long disjuncts (so, that's why it calls "preference").
@@ -1318,7 +1297,6 @@ public class ResolutionFunction
 	// ---------- STRIKEOUT STRATEGY ----------
 	
 	/**
-	 * [DEMONSTRATION]
 	 * Parameter for console: "strikeout".
 	 * This method makes only non-expanding (which don't consist full of any other disjunct) disjuncts.
 	 * Also, it means it will delete a duplicate disjuncts. The method will work until the empty disjunct would be find.
@@ -1463,7 +1441,7 @@ public class ResolutionFunction
 			localF.RefreshPredicate();
 			disjuncts.addAll(localF.GetDisjuncts());
 			this.SortDPredicate(); // the order is important
-			this.RefreshExtensionPredicateTest(d);
+			this.RefreshExtensionPredicateSize(d);
 			//this.RefreshPredicate(); // it's only here, because at the end it doesn't work
 			for (i = 0; i < disjuncts.size() - 1; i++)
 			{
@@ -1578,7 +1556,7 @@ public class ResolutionFunction
 				disjuncts.addAll(localF.GetDisjuncts());
 				this.SortDPredicate(); // the order is important
 				//this.RefreshPredicate();
-				this.RefreshExtensionPredicateTest(d); // it's only here, because at the end it doesn't work
+				this.RefreshExtensionPredicateSize(d); // it's only here, because at the end it doesn't work
 			}
 		}
 	}

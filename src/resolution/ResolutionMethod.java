@@ -1,10 +1,8 @@
 // Alternative exam -- 4 term
 // © Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.22
+// Resolution method version alpha 0.24
 // Updates:
-// -- Deep copy constructors added for each valuable class
-// -- New string construction in each constructor and setter added for every class
-// -- Nakonetsto zdelal logiku predikatov
+// -- Statement logic resolution updated
 
 package resolution;
 
@@ -16,7 +14,7 @@ import java.util.HashSet;
 /**
  * Main class "ResolutionMethod"
  * @author MatmanBJ
- * @version alpha 0.23
+ * @version alpha 0.24
  */
 public class ResolutionMethod
 {
@@ -145,7 +143,14 @@ public class ResolutionMethod
 	}
 	public static ResolutionFunction TreatmentMain (String localString, ResolutionFunction localRF)
 	{
-		if (localString.equals("saturation"))
+		if (localString.equals("???"))
+		{
+			ResolutionFunction rfo = new ResolutionFunction(localRF);
+			ResolutionFunction rft = new ResolutionFunction(localRF);
+			rft.ResolutionAllFind();
+			rft.GetFunction();
+		}
+		else if (localString.equals("saturation"))
 		{
 			localRF.ResolutionSaturation();
 		}
@@ -161,15 +166,15 @@ public class ResolutionMethod
 		{
 			StrategiesDemonstration(localRF);
 		}
-		else if (localString.equals("resolution")) // technical, not for common usage
+		else if (localString.equals("all"))
 		{
-			localRF.Resolution();
+			localRF.ResolutionAll();
 		}
-		else if (localString.equals("find")) // technical, not for common usage
+		else if (localString.equals("all find"))
 		{
-			localRF.ResolutionFind();
+			localRF.ResolutionAllFind();
 		}
-		else if (localString.equals("unique")) // technical, not for common usage
+		else if (localString.equals("unique"))
 		{
 			localRF.ResolutionAllUnique();
 		}
@@ -266,9 +271,6 @@ public class ResolutionMethod
 	}
 	public static void main(String[] args)
 	{
-		//ExampleTwo();
-		//StrategiesDemonstration();
-		
 		Scanner inputScanner = new Scanner(System.in);
 		int key = 1;
 		String typeLogic;
@@ -297,7 +299,6 @@ public class ResolutionMethod
 			{
 				localFunction = InputMain(typeInput);
 				localFunction = TreatmentMain(typeTreatment, localFunction);
-				//localFunction.ResolutionAllUnique();
 				OutputMain(localFunction, typeOutput);
 			}
 			else if (typeLogic.equals("predicate"))
@@ -308,7 +309,7 @@ public class ResolutionMethod
 			}
 			else
 			{
-				System.out.println("Incorrect type of logic! Default input from console");
+				System.out.println("Incorrect type of logic! Try again");
 			}
 			
 			System.out.println("Do you want to input something else? Press 0 to NO, press else to YES:");

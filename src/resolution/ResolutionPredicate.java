@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * Resolution predicate class.
  * @author MatmanBJ
- * @version alpha 0.23
+ * @version alpha 0.24
  */
 public class ResolutionPredicate
 {
