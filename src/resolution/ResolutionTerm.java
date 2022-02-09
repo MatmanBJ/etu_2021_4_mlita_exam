@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * but they can have term type (constants, variables and functions) and terms list (only for functions).
  * Terms [instead of predicates and "classic" statement-logic variables] in the predicate (and in the functions) can't change their place.
  * @author MatmanBJ
- * @version alpha 0.22
+ * @version alpha 0.23
  */
 public class ResolutionTerm
 {
@@ -113,6 +113,19 @@ public class ResolutionTerm
 	// 2 -- REALIOVAT POLNYJ VVOD I VYVOD PREDICATOV
 	// 3 -- REALIZOVAL FUNKCIJU I UNIFIKACIJU
 	// 4 -- REALIZOVAT LINEJNUJU REZOLUCIJU
+	
+	/*public int compareTo (ResolutionTerm localTerm)
+	{
+		int localCompare = this.GetName().compareTo(localTerm.GetName());
+		if (localCompare == 0 && this.GetTerm().equals(ResolutionTerm.GetFunction()) && localTerm.GetTerm().equals(ResolutionTerm.GetFunction()))
+		{
+			while (localCompare == 0)
+			{
+				
+			}
+		}
+		return 0;
+	}*/
 	
 	public boolean localFunctionCheck (ResolutionTerm localTerm) // for vars only
 	{

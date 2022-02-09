@@ -44,6 +44,9 @@ P(a,f(x,g(c,h(e,k,l),β),y),b)
 P(a,f(x,g(c,h(e,k,l),β),y),b)
 !P(a,f(α,g(c,h(e,s,s),j(v)),y),b)
 
+P(a,f(x,g(c,h(e,k,l),v),y),b)
+!P(a,f(α,g(c,h(e,s,s),j(v)),y),b)
+
 Пример (Басков):
 
 !S(x) + !N(t) + C(x,t)
@@ -55,3 +58,9 @@ M(τ)
 G(x) + !R(x) + S(x)
 R(β)
 !C(β,τ)
+
+G(x) + !R(x) + S(x)
+!S(x) + !G(t) + R(t)
+R(β)
+!S(β)
+!G(x)

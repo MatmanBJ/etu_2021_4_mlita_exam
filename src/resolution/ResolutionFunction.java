@@ -14,7 +14,7 @@ import java.lang.Object.*;
  * By default, it is commonly prepared for the resolution.
  * A function contains a list with disjuncts.
  * @author MatmanBJ
- * @version alpha 0.22
+ * @version alpha 0.23
  */
 public class ResolutionFunction
 {
@@ -376,6 +376,161 @@ public class ResolutionFunction
 					ekwality = false;
 				}
 				if (ekwality == true)
+				{
+					disjuncts.remove(j);
+					j = j - 1;
+				}
+			}
+		}
+	}
+	
+	public void RefreshPredicate ()
+	{
+		for (int i = 0; i < this.GetDisjuncts().size() - 1; i++)
+		{
+			for (int j = i + 1; j < this.GetDisjuncts().size(); j++)
+			{
+				boolean ekwality = true;
+				if ((disjuncts.get(i).GetPredicates().size() == disjuncts.get(j).GetPredicates().size())
+						&& (disjuncts.get(i).GetOne() == disjuncts.get(j).GetOne())
+						&& (disjuncts.get(i).GetEmpty() == disjuncts.get(j).GetEmpty()))
+				{
+					for (int k = 0; k < disjuncts.get(i).GetPredicates().size(); k++)
+					{
+						if (!(disjuncts.get(i).GetPredicates().get(k).equals(disjuncts.get(j).GetPredicates().get(k))) // don't forget "!"
+								||
+								(disjuncts.get(i).GetPredicates().get(k).GetDenial() !=
+								disjuncts.get(j).GetPredicates().get(k).GetDenial()))
+						{
+							ekwality = false;
+						}
+					}
+				}
+				else
+				{
+					ekwality = false;
+				}
+				if (ekwality == true)
+				{
+					disjuncts.remove(j);
+					j = j - 1;
+				}
+			}
+		}
+	}
+	
+	public void RefreshExtensionPredicate (int localSize)
+	{
+		for (int i = 0; i < localSize; i++)
+		{
+			for (int j = localSize; j < disjuncts.size(); j++)
+			{
+				boolean ekwality = true;
+				if ((disjuncts.get(i).GetOne() == disjuncts.get(j).GetOne())
+						&& (disjuncts.get(i).GetEmpty() == disjuncts.get(j).GetEmpty()))
+				{
+					int localMaxSize = 0;
+					if (disjuncts.get(i).GetPredicates().size() <= disjuncts.get(j).GetPredicates().size())
+					{
+						localMaxSize = disjuncts.get(i).GetPredicates().size();
+					}
+					else
+					{
+						ekwality = false;
+					}
+					// we have two situations: the last (j) disjunct should be less or equal to current (i)
+					// disjunct -- so that we can delete him, else it would be unnesessary and wrong
+					// because we should prevent expansion instead of giving a "chance" to the new disjunct!!!
+					for (int k = 0; k < localMaxSize; k++)
+					{
+						boolean localEkwality = false;
+						for (int l = 0; l < disjuncts.get(j).GetPredicates().size(); l++)
+						{
+							if ((disjuncts.get(i).GetPredicates().get(k).equals(disjuncts.get(j).GetPredicates().get(l))) // don't forget "!"
+									&&
+									(disjuncts.get(i).GetPredicates().get(k).GetDenial() ==
+									disjuncts.get(j).GetPredicates().get(l).GetDenial()))
+							{
+								//System.out.println((i + 1) + " " + (j + 1) + " " + (k + 1) + " " + (l + 1));
+								localEkwality = true;
+							}
+						}
+						if (localEkwality == false)
+						{
+							ekwality = false;
+						}
+					}
+				}
+				else
+				{
+					ekwality = false;
+				}
+				if (ekwality == true)
+				{
+					disjuncts.remove(j);
+					j = j - 1;
+				}
+				else if (disjuncts.get(j).GetOne() == true)
+				{
+					disjuncts.remove(j);
+					j = j - 1;
+				}
+			}
+		}
+	}
+	
+	public void RefreshExtensionPredicateTest (int localSize)
+	{
+		for (int i = 0; i < localSize; i++)
+		{
+			for (int j = localSize; j < disjuncts.size(); j++)
+			{
+				boolean ekwality = true;
+				if ((disjuncts.get(i).GetOne() == disjuncts.get(j).GetOne())
+						&& (disjuncts.get(i).GetEmpty() == disjuncts.get(j).GetEmpty()))
+				{
+					int localMaxSize = 0;
+					if (disjuncts.get(i).GetPredicates().size() <= disjuncts.get(j).GetPredicates().size())
+					{
+						localMaxSize = disjuncts.get(i).GetPredicates().size();
+					}
+					else
+					{
+						ekwality = false;
+					}
+					// we have two situations: the last (j) disjunct should be less or equal to current (i)
+					// disjunct -- so that we can delete him, else it would be unnesessary and wrong
+					// because we should prevent expansion instead of giving a "chance" to the new disjunct!!!
+					for (int k = 0; k < localMaxSize; k++)
+					{
+						boolean localEkwality = false;
+						for (int l = 0; l < disjuncts.get(j).GetPredicates().size(); l++)
+						{
+							if ((disjuncts.get(i).GetPredicates().get(k).sizeEquals(disjuncts.get(j).GetPredicates().get(l))) // don't forget "!"
+									&&
+									(disjuncts.get(i).GetPredicates().get(k).GetDenial() ==
+									disjuncts.get(j).GetPredicates().get(l).GetDenial()))
+							{
+								//System.out.println((i + 1) + " " + (j + 1) + " " + (k + 1) + " " + (l + 1));
+								localEkwality = true;
+							}
+						}
+						if (localEkwality == false)
+						{
+							ekwality = false;
+						}
+					}
+				}
+				else
+				{
+					ekwality = false;
+				}
+				if (ekwality == true)
+				{
+					disjuncts.remove(j);
+					j = j - 1;
+				}
+				else if (disjuncts.get(j).GetOne() == true)
 				{
 					disjuncts.remove(j);
 					j = j - 1;
@@ -1292,21 +1447,24 @@ public class ResolutionFunction
 		int removeIndex = 0;
 		boolean repeat = true;
 		boolean adding = false; // adding disjuncts in the end indicator
+		boolean oneExist = false;
 		ResolutionFunction localF = new ResolutionFunction();
 		localF.GetDisjuncts().addAll(disjuncts);
 		disjuncts.removeAll(disjuncts);
 		this.RefreshDPredicate();
 		this.SortDPredicate();
-		//this.Refresh();
+		this.RefreshPredicate();
 		while (repeat == true)
 		{
 			ResolutionFunction localFR = new ResolutionFunction();
 			int d = disjuncts.size();
 			localF.SortDPredicate(); // the order is important
-			//localF.Refresh();
+			localF.RefreshDPredicate();
+			localF.RefreshPredicate();
 			disjuncts.addAll(localF.GetDisjuncts());
 			this.SortDPredicate(); // the order is important
-			//this.Refresh(); // it's only here, because at the end it doesn't work
+			this.RefreshExtensionPredicateTest(d);
+			//this.RefreshPredicate(); // it's only here, because at the end it doesn't work
 			for (i = 0; i < disjuncts.size() - 1; i++)
 			{
 				ResolutionDisjunct localDisjunct = disjuncts.get(i);
@@ -1371,9 +1529,20 @@ public class ResolutionFunction
 								localNewDisjunct.RefreshPredicate();
 								localNewDisjunct.SortPredicate();
 								
-								System.out.print(localNewDisjunct.toOutputStringPredicate(0));
+								//System.out.print(localNewDisjunct.toOutputStringPredicate(0));
 								
-								localFR.SetDisjuncts(localNewDisjunct);
+								if (oneExist == false)
+								{
+									localFR.SetDisjuncts(localNewDisjunct);
+									if (localNewDisjunct.GetOne() == true)
+									{
+										oneExist = true;
+									}
+								}
+								else if (localNewDisjunct.GetOne() == false)
+								{
+									localFR.SetDisjuncts(localNewDisjunct);
+								}
 								
 								if (localNewDisjunct.GetEmpty() && repeat == true)
 								{
@@ -1397,18 +1566,19 @@ public class ResolutionFunction
 			localF = localFR;
 			if (adding)
 			{
-				q = localF.GetDisjuncts().size();
-				for (p = removeIndex; p < q; p++)
-				{
-					localF.GetDisjuncts().remove(removeIndex);
-				}
+				//q = localF.GetDisjuncts().size();
+				//for (p = removeIndex; p < q; p++)
+				//{
+				//	localF.GetDisjuncts().remove(removeIndex);
+				//}
 				
 				d = disjuncts.size();
 				localF.SortDPredicate(); // the order is important
-				//localF.RefreshPredicate();
+				localF.RefreshPredicate();
 				disjuncts.addAll(localF.GetDisjuncts());
 				this.SortDPredicate(); // the order is important
-				//this.RefreshExtension(d); // it's only here, because at the end it doesn't work
+				//this.RefreshPredicate();
+				this.RefreshExtensionPredicateTest(d); // it's only here, because at the end it doesn't work
 			}
 		}
 	}

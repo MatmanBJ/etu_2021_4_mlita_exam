@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * Resolution predicate class.
  * @author MatmanBJ
- * @version alpha 0.22
+ * @version alpha 0.23
  */
 public class ResolutionPredicate
 {
@@ -158,6 +158,38 @@ public class ResolutionPredicate
 			localEquality = false;
 		}
 		return localEquality;
+	}
+	
+	public boolean sizeEquals (ResolutionPredicate localPredicate)
+	{
+		boolean localEquality = true;
+		if ((this.GetName().equals(localPredicate.GetName())) && (this.GetTerms().size() == localPredicate.GetTerms().size()))
+		{
+			localEquality = true;
+		}
+		else
+		{
+			localEquality = false;
+		}
+		return localEquality;
+	}
+	
+	@Override
+	public String toString ()
+	{
+		String localStringDisjunct = "";
+		String inverse;
+		if (this.GetDenial() == true)
+		{
+			inverse = "";
+		}
+		else
+		{
+			inverse = "!";
+		}
+		localStringDisjunct = localStringDisjunct + inverse + this.GetName();
+		localStringDisjunct = localStringDisjunct + "(" + ResolutionDisjunct.localToStringPredicate("", this.GetTerms()) + ")";
+		return "";
 	}
 	
 	@Override
