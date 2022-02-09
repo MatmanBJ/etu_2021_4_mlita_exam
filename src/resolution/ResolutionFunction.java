@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Scanner;
 import java.io.*;
+import java.util.Formatter;
 import java.util.Arrays;
 import java.lang.Object.*;
 
@@ -14,7 +15,7 @@ import java.lang.Object.*;
  * By default, it is commonly prepared for the resolution.
  * A function contains a list with disjuncts.
  * @author MatmanBJ
- * @version alpha 0.29
+ * @version beta 0.30
  */
 public class ResolutionFunction
 {
@@ -22,11 +23,64 @@ public class ResolutionFunction
 	// ---------- VARIABLES ----------
 	// -------------------------------
 	
+	private static boolean logRegime = false;
+	private static String logType = "none";
+	//private static String logName = "";
+	private static int logID = 0;
+	private static boolean safeRegime = false;
+	private static int safeType = 1000;
+	private static int safeNumber = 0;
 	private ArrayList<ResolutionDisjunct> disjuncts = new ArrayList<ResolutionDisjunct>();
 	
 	// -----------------------------
 	// ---------- METHODS ----------
 	// -----------------------------
+	
+	// ---------- SETTERS ----------
+	
+	public static void SetLogRegime (boolean localLogRegime)
+	{
+		logRegime = localLogRegime;
+	}
+	public static void SetLogType (String localLogType)
+	{
+		logType = localLogType;
+	}
+	public static void SetSafeRegime (boolean localSafeRegime)
+	{
+		safeRegime = localSafeRegime;
+	}
+	public static void SetSafeType (int localSafeType)
+	{
+		safeType = localSafeType;
+	}
+	public static void SetSafeNumber (int localSafeNumber)
+	{
+		safeNumber = localSafeNumber;
+	}
+	
+	// ---------- GETTERS ----------
+	
+	public static boolean GetLogRegime ()
+	{
+		return logRegime;
+	}
+	public static String GetLogType ()
+	{
+		return logType;
+	}
+	public static boolean GetSafeRegime ()
+	{
+		return safeRegime;
+	}
+	public static int GetSafeType ()
+	{
+		return safeType;
+	}
+	public static int GetSafeNumber ()
+	{
+		return safeNumber;
+	}
 	
 	// ---------- CONSTRUCTORS ----------
 	
@@ -192,6 +246,22 @@ public class ResolutionFunction
 	}
 	
 	// ---------- METHODS ----------
+	
+	/**
+	 * This method check if there is too much disjuncts in safe regime.
+	 */
+	public static boolean SafeCheck (boolean localSafeRegime, int localSafeNumber, int localSafeType) throws Exception
+	{
+		if (localSafeRegime == true && localSafeNumber > localSafeType)
+		{
+			throw new Exception("The loop has been terminated, because number of new created disjuncts (" + localSafeNumber + ") is more, than " + localSafeType + "!");
+			//return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 	
 	/**
 	 * This method consistently applies "Sort" method from "ResolutionDisjunct" class for each disjunct in the function.
@@ -904,7 +974,7 @@ public class ResolutionFunction
 	 * WARNING: IT MAY NOT STOP!
 	 * @author MatmanBJ
 	 */
-	public ResolutionFunction ResolutionAll ()
+	public ResolutionFunction ResolutionAll () throws Exception
 	{
 		int i;
 		int j;
@@ -962,6 +1032,8 @@ public class ResolutionFunction
 								localNewDisjunct.Sort();
 								
 								localFR.SetDisjuncts(localNewDisjunct);
+								safeNumber = safeNumber + 1;
+								ResolutionFunction.SafeCheck(safeRegime, safeNumber, safeType);
 							}
 						}
 					}
@@ -980,13 +1052,13 @@ public class ResolutionFunction
 	
 	/**
 	 * [DEMONSTRATION]
-	 * Parameter for console: "all number".
+	 * Parameter for console: "all_number".
 	 * This method makes all possible disjuncts for number of iterations.
 	 * Then it stops, when given number of iterations will be passed.
 	 * It only works for number, not for finding an empty disjunct!
 	 * @author MatmanBJ
 	 */
-	public ResolutionFunction ResolutionAllNumber (int localIterations)
+	public ResolutionFunction ResolutionAllNumber (int localIterations) throws Exception
 	{
 		int m;
 		int i;
@@ -997,19 +1069,96 @@ public class ResolutionFunction
 		ResolutionFunction localF = new ResolutionFunction();
 		localF.GetDisjuncts().addAll(disjuncts);
 		disjuncts.removeAll(disjuncts);
+		FileWriter writer = null;
+		Formatter fm = null;
+		if (logRegime == true && (logType.equals("file") || logType.equals("all")))
+		{
+			try
+			{
+				logID = logID + 1;
+				writer = new FileWriter("log_" + logID + ".txt", false);
+				fm = new Formatter(writer);
+				writer.write("Current number of iterations: " + localIterations + "\n");
+			}
+			catch (Exception ex)
+			{
+				if (fm != null && writer != null)
+				{
+					fm.close();
+					writer.close();
+				}
+			}
+		}
 		for (m = 0; m <= localIterations; m++) // "m <= localIterations" is for last iteration for adding disjuncts!!! (last +1 iteration's disjuncts won't be added)
 		{
 			ResolutionFunction localFR = new ResolutionFunction();
 			
-			System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
-			System.out.format("|%-120s|\n", "ITERATION " + m);
-			System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
-			for (i = 0; i < localF.GetDisjuncts().size(); i++)
+			if (logRegime == true && logType.equals("console"))
 			{
-				System.out.format("|%-120s|\n", localF.GetDisjuncts().get(i).toOutputStringOnly(i + 1));
+				System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
+				System.out.format("|%-120s|\n", "ITERATION " + m);
+				System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
+				for (i = 0; i < localF.GetDisjuncts().size(); i++)
+				{
+					System.out.format("|%-120s|\n", localF.GetDisjuncts().get(i).toOutputStringOnly(i + 1));
+				}
+				System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
 			}
-			//localF.GetFunction();
-			System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
+			else if (logRegime == true && logType.equals("file"))
+			{
+				try
+				{
+					writer.write("+------------------------------------------------------------------------------------------------------------------------+\n");
+					fm.format("|%-120s|\n", "ITERATION " + m);
+					writer.write("+------------------------------------------------------------------------------------------------------------------------+\n");
+					for (i = 0; i < localF.GetDisjuncts().size(); i++)
+					{
+						fm.format("|%-120s|\n", localF.GetDisjuncts().get(i).toOutputStringOnly(i + 1));
+					}
+					writer.write("+------------------------------------------------------------------------------------------------------------------------+\n");
+				}
+				catch (Exception ex)
+				{
+					System.out.println(ex.getMessage());
+					if (fm != null && writer != null)
+					{
+						fm.close();
+						writer.close();
+					}
+				}
+			}
+			else if (logRegime == true && logType.equals("all"))
+			{
+				System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
+				System.out.format("|%-120s|\n", "ITERATION " + m);
+				System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
+				for (i = 0; i < localF.GetDisjuncts().size(); i++)
+				{
+					System.out.format("|%-120s|\n", localF.GetDisjuncts().get(i).toOutputStringOnly(i + 1));
+				}
+				System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
+				
+				try
+				{
+					writer.write("+------------------------------------------------------------------------------------------------------------------------+\n");
+					fm.format("|%-120s|\n", "ITERATION " + m);
+					writer.write("+------------------------------------------------------------------------------------------------------------------------+\n");
+					for (i = 0; i < localF.GetDisjuncts().size(); i++)
+					{
+						fm.format("|%-120s|\n", localF.GetDisjuncts().get(i).toOutputStringOnly(i + 1));
+					}
+					writer.write("+------------------------------------------------------------------------------------------------------------------------+\n");
+				}
+				catch (Exception ex)
+				{
+					System.out.println(ex.getMessage());
+					if (fm != null && writer != null)
+					{
+						fm.close();
+						writer.close();
+					}
+				}
+			}
 			
 			int d = disjuncts.size();
 			disjuncts.addAll(localF.GetDisjuncts());
@@ -1055,6 +1204,8 @@ public class ResolutionFunction
 								localNewDisjunct.Sort();
 								
 								localFR.SetDisjuncts(localNewDisjunct);
+								safeNumber = safeNumber + 1;
+								ResolutionFunction.SafeCheck(safeRegime, safeNumber, safeType);
 							}
 						}
 					}
@@ -1062,7 +1213,50 @@ public class ResolutionFunction
 			}
 			localF = localFR;
 		}
-		System.out.print("\n");
+		if (logRegime == true && logType.equals("console"))
+		{
+			System.out.print("\n");
+		}
+		else if (logRegime == true && logType.equals("file"))
+		{
+			try
+			{
+				writer.write("\n");
+			}
+			catch (Exception ex)
+			{
+				System.out.println(ex.getMessage());
+			}
+			finally
+			{
+				if (fm != null && writer != null)
+				{
+					fm.close();
+					writer.close();
+				}
+			}
+		}
+		else if (logRegime == true && logType.equals("all"))
+		{
+			System.out.print("\n");
+			
+			try
+			{
+				writer.write("\n");
+			}
+			catch (Exception ex)
+			{
+				System.out.println(ex.getMessage());
+			}
+			finally
+			{
+				if (fm != null && writer != null)
+				{
+					fm.close();
+					writer.close();
+				}
+			}
+		}
 		return localF;
 	}
 	
@@ -1070,14 +1264,14 @@ public class ResolutionFunction
 	
 	/**
 	 * [DEMONSTRATION]
-	 * Parameter for console: "all find".
+	 * Parameter for console: "all_find".
 	 * This method makes all possible disjuncts until it will find an empty one.
 	 * Then it stops (breaks) all the loops.
 	 * The method will work until an empty disjunct will be found or all possible disjuncts will be found.
 	 * WARNING: IT MAY NOT STOP!
 	 * @author MatmanBJ
 	 */
-	public void ResolutionAllFind ()
+	public void ResolutionAllFind () throws Exception
 	{
 		int i;
 		int j;
@@ -1156,6 +1350,8 @@ public class ResolutionFunction
 									repeat = false;
 								}
 								localFR.SetDisjuncts(localNewDisjunct);
+								safeNumber = safeNumber + 1;
+								ResolutionFunction.SafeCheck(safeRegime, safeNumber, safeType);
 							}
 						}
 					}
@@ -1184,7 +1380,7 @@ public class ResolutionFunction
 	 * It makes all possible disjuncts for the first iteration (as in the task).
 	 * @author MatmanBJ
 	 */
-	public ResolutionFunction ResolutionIDZ ()
+	public ResolutionFunction ResolutionIDZ () throws Exception
 	{
 		return ResolutionAllNumber (1);
 	}
@@ -1193,14 +1389,14 @@ public class ResolutionFunction
 	
 	/**
 	 * [DEMONSTRATION]
-	 * Parameter for console: "all unique".
+	 * Parameter for console: "all_unique".
 	 * This method makes all possible, but unique disjuncts
 	 * (first gotten disjunct is new unique, other will be deleted).
 	 * I guess it's a remake of the famous "ResolutionHash" (absolutely LEGENDARY function)!
 	 * The method will work until all unique disjunct would be find.
 	 * @author MatmanBJ
 	 */
-	public void ResolutionAllUnique ()
+	public void ResolutionAllUnique () throws Exception
 	{
 		int i;
 		int j;
@@ -1262,6 +1458,8 @@ public class ResolutionFunction
 								localNewDisjunct.Sort();
 								
 								localFR.SetDisjuncts(localNewDisjunct);
+								safeNumber = safeNumber + 1;
+								ResolutionFunction.SafeCheck(safeRegime, safeNumber, safeType);
 							}
 						}
 					}
@@ -1285,7 +1483,7 @@ public class ResolutionFunction
 	 * The method will work until the empty disjunct would be find.
 	 * @author MatmanBJ
 	 */
-	public void ResolutionSaturation () // saturation strategy demonstration
+	public void ResolutionSaturation () throws Exception // saturation strategy demonstration
 	{
 		int i;
 		int j;
@@ -1357,6 +1555,8 @@ public class ResolutionFunction
 								}
 								
 								localFR.SetDisjuncts(localNewDisjunct);
+								safeNumber = safeNumber + 1;
+								ResolutionFunction.SafeCheck(safeRegime, safeNumber, safeType);
 							}
 						}
 					}
@@ -1391,7 +1591,7 @@ public class ResolutionFunction
 	 * The method will work until the empty disjunct would be find.
 	 * @author MatmanBJ
 	 */
-	public void ResolutionPreference ()
+	public void ResolutionPreference () throws Exception
 	{
 		int i;
 		int j;
@@ -1467,6 +1667,8 @@ public class ResolutionFunction
 								}
 								
 								localFR.SetDisjuncts(localNewDisjunct);
+								safeNumber = safeNumber + 1;
+								ResolutionFunction.SafeCheck(safeRegime, safeNumber, safeType);
 							}
 						}
 					}
@@ -1501,7 +1703,7 @@ public class ResolutionFunction
 	 * Also, it means it will delete a duplicate disjuncts. The method will work until the empty disjunct would be find.
 	 * @author MatmanBJ
 	 */
-	public void ResolutionStrikeout ()
+	public void ResolutionStrikeout () throws Exception
 	{		
 		int i;
 		int j;
@@ -1575,6 +1777,8 @@ public class ResolutionFunction
 								}
 								
 								localFR.SetDisjuncts(localNewDisjunct);
+								safeNumber = safeNumber + 1;
+								ResolutionFunction.SafeCheck(safeRegime, safeNumber, safeType);
 							}
 						}
 					}
@@ -1613,7 +1817,7 @@ public class ResolutionFunction
 	 * so an empty disjunct exist, it will be found!
 	 * @author MatmanBJ
 	 */
-	public void ResolutionSemantic ()
+	public void ResolutionSemantic () throws Exception
 	{
 		int i;
 		int j;
@@ -1629,6 +1833,30 @@ public class ResolutionFunction
 		ResolutionFunction localFalse = new ResolutionFunction();
 		ResolutionFunction localF = new ResolutionFunction();
 		
+		FileWriter writer = null;
+		Formatter fm = null;
+		if (logRegime == true && (logType.equals("file") || logType.equals("all")))
+		{
+			try
+			{
+				logID = logID + 1;
+				writer = new FileWriter("log_" + logID + ".txt", false);
+				fm = new Formatter(writer);
+			}
+			catch (Exception ex)
+			{
+				if (fm != null && writer != null)
+				{
+					fm.close();
+					writer.close();
+				}
+			}
+		}
+		
+		System.out.println("Please choose interpretation for your variables/predicates.");
+		System.out.println("For example you want {x, !y} interpretation, so write 1 0 under the variables/predicates.");
+		System.out.println("Your variables:");
+		
 		ArrayList<String> localInterpretation = new ArrayList<String>(); // only "true" interpretation
 		for (ResolutionDisjunct p : disjuncts)
 		{
@@ -1637,15 +1865,205 @@ public class ResolutionFunction
 				if (localInterpretation.contains(q.GetName()) == false)
 				{
 					localInterpretation.add(new String(q.GetName()));
+					System.out.print(localInterpretation.get(localInterpretation.size() - 1) + " ");
 				}
 			}
 		}
 		
+		System.out.println("\nYour interpretation:");
+		Scanner inputScanner = new Scanner(System.in);
+		//System.out.println("Please write number of iterations:");
+		String localInter [];
+		
+		// trying to input interpretation
+		
+		try
+		{
+			localInter = inputScanner.nextLine().split(" ");
+			if (localInter.length == localInterpretation.size())
+			{
+				int p = 0;
+				ArrayList<String> localLocalInterpretation = new ArrayList<String>();
+				for (String q : localInterpretation)
+				{
+					if (localInter[p].equals("0") == false)
+					{
+						localLocalInterpretation.add(q);
+					}
+					p = p + 1;
+				}
+				localInterpretation = localLocalInterpretation;
+			}
+			else
+			{
+				throw new Exception("Wrong length (size) isn't equal to variables/predicates array!");
+			}
+		}
+		catch (Exception exc)
+		{
+			System.out.println(exc.getMessage() + "\nInterpretation will be default (all true)!");
+		}
+		
+		System.out.print("Your true interpretation:\n{");
+		for (int q = 0; q < localInterpretation.size(); q++)
+		{
+			if (q < localInterpretation.size() - 1)
+			{
+				System.out.print(localInterpretation.get(q) + ", ");
+			}
+			else
+			{
+				System.out.print(localInterpretation.get(q));
+			}
+		}
+		System.out.println("}");
+		
+		if (logRegime == true && (logType.equals("file") || logType.equals("all")))
+		{
+			try
+			{
+				writer.write("Your true interpretation:\n{");
+				for (int q = 0; q < localInterpretation.size(); q++)
+				{
+					if (q < localInterpretation.size() - 1)
+					{
+						writer.write(localInterpretation.get(q) + ", ");
+					}
+					else
+					{
+						writer.write(localInterpretation.get(q));
+					}
+				}
+				writer.write("}\n");
+			}
+			catch (Exception ex)
+			{
+				System.out.println(ex.getMessage());
+				if (fm != null && writer != null)
+				{
+					fm.close();
+					writer.close();
+				}
+			}
+		}
+		
+		/*
+		if (logRegime == true && logType.equals("console"))
+		{
+			System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
+			System.out.format("|%-120s|\n", "ITERATION " + m);
+			System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
+			for (i = 0; i < localF.GetDisjuncts().size(); i++)
+			{
+				System.out.format("|%-120s|\n", localF.GetDisjuncts().get(i).toOutputStringOnly(i + 1));
+			}
+			System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
+		}
+		else if (logRegime == true && logType.equals("file"))
+		{
+			try
+			{
+				writer.write("+------------------------------------------------------------------------------------------------------------------------+\n");
+				fm.format("|%-120s|\n", "ITERATION " + m);
+				writer.write("+------------------------------------------------------------------------------------------------------------------------+\n");
+				for (i = 0; i < localF.GetDisjuncts().size(); i++)
+				{
+					fm.format("|%-120s|\n", localF.GetDisjuncts().get(i).toOutputStringOnly(i + 1));
+				}
+				writer.write("+------------------------------------------------------------------------------------------------------------------------+\n");
+			}
+			catch (Exception ex)
+			{
+				System.out.println(ex.getMessage());
+				if (fm != null && writer != null)
+				{
+					fm.close();
+					writer.close();
+				}
+			}
+		}
+		else if (logRegime == true && logType.equals("all"))
+		{
+			System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
+			System.out.format("|%-120s|\n", "ITERATION " + m);
+			System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
+			for (i = 0; i < localF.GetDisjuncts().size(); i++)
+			{
+				System.out.format("|%-120s|\n", localF.GetDisjuncts().get(i).toOutputStringOnly(i + 1));
+			}
+			System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
+			
+			try
+			{
+				writer.write("+------------------------------------------------------------------------------------------------------------------------+\n");
+				fm.format("|%-120s|\n", "ITERATION " + m);
+				writer.write("+------------------------------------------------------------------------------------------------------------------------+\n");
+				for (i = 0; i < localF.GetDisjuncts().size(); i++)
+				{
+					fm.format("|%-120s|\n", localF.GetDisjuncts().get(i).toOutputStringOnly(i + 1));
+				}
+				writer.write("+------------------------------------------------------------------------------------------------------------------------+\n");
+			}
+			catch (Exception ex)
+			{
+				System.out.println(ex.getMessage());
+				if (fm != null && writer != null)
+				{
+					fm.close();
+					writer.close();
+				}
+			}
+		}
+		*/
+		
 		localF.GetDisjuncts().addAll(disjuncts);
 		disjuncts.removeAll(disjuncts);
-		System.out.println("+---------------------------------------+---------------------------------------+");
-		System.out.format("|%-39s|%-39s|", "TRUE INTERPRETATION", "FALSE INTERPRETATION");
-		System.out.println("\n+---------------------------------------+---------------------------------------+");
+		if (logRegime == true && logType.equals("console"))
+		{
+			System.out.println("+---------------------------------------+---------------------------------------+");
+			System.out.format("|%-39s|%-39s|", "TRUE INTERPRETATION", "FALSE INTERPRETATION");
+			System.out.println("\n+---------------------------------------+---------------------------------------+");
+		}
+		else if (logRegime == true && logType.equals("file"))
+		{
+			try
+			{
+				writer.write("+---------------------------------------+---------------------------------------+\n");
+				fm.format("|%-39s|%-39s|", "TRUE INTERPRETATION", "FALSE INTERPRETATION");
+				writer.write("\n+---------------------------------------+---------------------------------------+\n");
+			}
+			catch (Exception ex)
+			{
+				System.out.println(ex.getMessage());
+				if (fm != null && writer != null)
+				{
+					fm.close();
+					writer.close();
+				}
+			}
+		}
+		else if (logRegime == true && logType.equals("all"))
+		{
+			System.out.println("+---------------------------------------+---------------------------------------+");
+			System.out.format("|%-39s|%-39s|", "TRUE INTERPRETATION", "FALSE INTERPRETATION");
+			System.out.println("\n+---------------------------------------+---------------------------------------+");
+			
+			try
+			{
+				writer.write("+---------------------------------------+---------------------------------------+\n");
+				fm.format("|%-39s|%-39s|", "TRUE INTERPRETATION", "FALSE INTERPRETATION");
+				writer.write("\n+---------------------------------------+---------------------------------------+\n");
+			}
+			catch (Exception ex)
+			{
+				System.out.println(ex.getMessage());
+				if (fm != null && writer != null)
+				{
+					fm.close();
+					writer.close();
+				}
+			}
+		}
 		
 		while (repeat == true)
 		{
@@ -1653,9 +2071,52 @@ public class ResolutionFunction
 			localF.Refresh();
 			
 			iter = iter + 1;
-			System.out.println("+---------------------------------------+---------------------------------------+");
-			System.out.format("|%-79s|\n", "ITERATION " + iter);
-			System.out.println("+---------------------------------------+---------------------------------------+");
+			if (logRegime == true && logType.equals("console"))
+			{
+				System.out.println("+---------------------------------------+---------------------------------------+");
+				System.out.format("|%-79s|\n", "ITERATION " + iter);
+				System.out.println("+---------------------------------------+---------------------------------------+");
+			}
+			else if (logRegime == true && logType.equals("file"))
+			{
+				try
+				{
+					writer.write("+---------------------------------------+---------------------------------------+\n");
+					fm.format("|%-79s|\n", "ITERATION " + iter);
+					writer.write("+---------------------------------------+---------------------------------------+\n");
+				}
+				catch (Exception ex)
+				{
+					System.out.println(ex.getMessage());
+					if (fm != null && writer != null)
+					{
+						fm.close();
+						writer.close();
+					}
+				}
+			}
+			else if (logRegime == true && logType.equals("all"))
+			{
+				System.out.println("+---------------------------------------+---------------------------------------+");
+				System.out.format("|%-79s|\n", "ITERATION " + iter);
+				System.out.println("+---------------------------------------+---------------------------------------+");
+				
+				try
+				{
+					writer.write("+---------------------------------------+---------------------------------------+\n");
+					fm.format("|%-79s|\n", "ITERATION " + iter);
+					writer.write("+---------------------------------------+---------------------------------------+\n");
+				}
+				catch (Exception ex)
+				{
+					System.out.println(ex.getMessage());
+					if (fm != null && writer != null)
+					{
+						fm.close();
+						writer.close();
+					}
+				}
+			}
 			
 			for (i = 0; i < localF.GetDisjuncts().size(); i++)
 			{
@@ -1695,33 +2156,150 @@ public class ResolutionFunction
 				c5 = c2;
 				c6 = localFalse.GetDisjuncts().size();
 			}
-			int ind1 = c1;
-			int ind2 = c2;
-			for (i = c5; i < c6; i++)
+			
+			if (logRegime == true && logType.equals("console"))
 			{
-				if (ind1 >= localTrue.GetDisjuncts().size())
+				int ind1 = c1;
+				int ind2 = c2;
+				for (i = c5; i < c6; i++)
 				{
-					System.out.format("|%-39s|%-39s|", "", localFalse.GetDisjuncts().get(ind2).toOutputStringOnly(ind2 + 1));
-				}
-				else if (ind2 >= localFalse.GetDisjuncts().size())
-				{
-					System.out.format("|%-39s|%-39s|", localTrue.GetDisjuncts().get(ind1).toOutputStringOnly(ind1 + 1), "");
-				}
-				else
-				{
-					System.out.format("|%-39s|%-39s|", localTrue.GetDisjuncts().get(ind1).toOutputStringOnly(ind1 + 1), localFalse.GetDisjuncts().get(ind2).toOutputStringOnly(ind2 + 1));
-				}
-				ind1 = ind1 + 1;
-				ind2 = ind2 + 1;
-				if (i + 1 != c6)
-				{
-					System.out.println("\n|---------------------------------------|---------------------------------------|");
-				}
-				else
-				{
-					System.out.print("\n");
+					if (ind1 >= localTrue.GetDisjuncts().size())
+					{
+						System.out.format("|%-39s|%-39s|", "", localFalse.GetDisjuncts().get(ind2).toOutputStringOnly(ind2 + 1));
+					}
+					else if (ind2 >= localFalse.GetDisjuncts().size())
+					{
+						System.out.format("|%-39s|%-39s|", localTrue.GetDisjuncts().get(ind1).toOutputStringOnly(ind1 + 1), "");
+					}
+					else
+					{
+						System.out.format("|%-39s|%-39s|", localTrue.GetDisjuncts().get(ind1).toOutputStringOnly(ind1 + 1), localFalse.GetDisjuncts().get(ind2).toOutputStringOnly(ind2 + 1));
+					}
+					ind1 = ind1 + 1;
+					ind2 = ind2 + 1;
+					if (i + 1 != c6)
+					{
+						System.out.println("\n|---------------------------------------|---------------------------------------|");
+					}
+					else
+					{
+						System.out.print("\n");
+					}
 				}
 			}
+			else if (logRegime == true && logType.equals("file"))
+			{
+				try
+				{
+					int ind1 = c1;
+					int ind2 = c2;
+					for (i = c5; i < c6; i++)
+					{
+						if (ind1 >= localTrue.GetDisjuncts().size())
+						{
+							fm.format("|%-39s|%-39s|", "", localFalse.GetDisjuncts().get(ind2).toOutputStringOnly(ind2 + 1));
+						}
+						else if (ind2 >= localFalse.GetDisjuncts().size())
+						{
+							fm.format("|%-39s|%-39s|", localTrue.GetDisjuncts().get(ind1).toOutputStringOnly(ind1 + 1), "");
+						}
+						else
+						{
+							fm.format("|%-39s|%-39s|", localTrue.GetDisjuncts().get(ind1).toOutputStringOnly(ind1 + 1), localFalse.GetDisjuncts().get(ind2).toOutputStringOnly(ind2 + 1));
+						}
+						ind1 = ind1 + 1;
+						ind2 = ind2 + 1;
+						if (i + 1 != c6)
+						{
+							writer.write("\n|---------------------------------------|---------------------------------------|\n");
+						}
+						else
+						{
+							writer.write("\n");
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					System.out.println(ex.getMessage());
+					if (fm != null && writer != null)
+					{
+						fm.close();
+						writer.close();
+					}
+				}
+			}
+			else if (logRegime == true && logType.equals("all"))
+			{
+				int ind1 = c1;
+				int ind2 = c2;
+				for (i = c5; i < c6; i++)
+				{
+					if (ind1 >= localTrue.GetDisjuncts().size())
+					{
+						System.out.format("|%-39s|%-39s|", "", localFalse.GetDisjuncts().get(ind2).toOutputStringOnly(ind2 + 1));
+					}
+					else if (ind2 >= localFalse.GetDisjuncts().size())
+					{
+						System.out.format("|%-39s|%-39s|", localTrue.GetDisjuncts().get(ind1).toOutputStringOnly(ind1 + 1), "");
+					}
+					else
+					{
+						System.out.format("|%-39s|%-39s|", localTrue.GetDisjuncts().get(ind1).toOutputStringOnly(ind1 + 1), localFalse.GetDisjuncts().get(ind2).toOutputStringOnly(ind2 + 1));
+					}
+					ind1 = ind1 + 1;
+					ind2 = ind2 + 1;
+					if (i + 1 != c6)
+					{
+						System.out.println("\n|---------------------------------------|---------------------------------------|");
+					}
+					else
+					{
+						System.out.print("\n");
+					}
+				}
+				
+				try
+				{
+					ind1 = c1;
+					ind2 = c2;
+					for (i = c5; i < c6; i++)
+					{
+						if (ind1 >= localTrue.GetDisjuncts().size())
+						{
+							fm.format("|%-39s|%-39s|", "", localFalse.GetDisjuncts().get(ind2).toOutputStringOnly(ind2 + 1));
+						}
+						else if (ind2 >= localFalse.GetDisjuncts().size())
+						{
+							fm.format("|%-39s|%-39s|", localTrue.GetDisjuncts().get(ind1).toOutputStringOnly(ind1 + 1), "");
+						}
+						else
+						{
+							fm.format("|%-39s|%-39s|", localTrue.GetDisjuncts().get(ind1).toOutputStringOnly(ind1 + 1), localFalse.GetDisjuncts().get(ind2).toOutputStringOnly(ind2 + 1));
+						}
+						ind1 = ind1 + 1;
+						ind2 = ind2 + 1;
+						if (i + 1 != c6)
+						{
+							writer.write("\n|---------------------------------------|---------------------------------------|\n");
+						}
+						else
+						{
+							writer.write("\n");
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					System.out.println(ex.getMessage());
+					if (fm != null && writer != null)
+					{
+						fm.close();
+						writer.close();
+					}
+				}
+			}
+			
 			for (i = 0; i < localTrue.GetDisjuncts().size(); i++)
 			{
 				ResolutionDisjunct localDisjunct = localTrue.GetDisjuncts().get(i);
@@ -1756,6 +2334,8 @@ public class ResolutionFunction
 								localNewDisjunct.Sort();
 								
 								localFR.SetDisjuncts(localNewDisjunct);
+								safeNumber = safeNumber + 1;
+								ResolutionFunction.SafeCheck(safeRegime, safeNumber, safeType);
 							}
 						}
 					}
@@ -1795,6 +2375,8 @@ public class ResolutionFunction
 								localNewDisjunct.Sort();
 								
 								localFR.SetDisjuncts(localNewDisjunct);
+								safeNumber = safeNumber + 1;
+								ResolutionFunction.SafeCheck(safeRegime, safeNumber, safeType);
 							}
 						}
 					}
@@ -1810,7 +2392,50 @@ public class ResolutionFunction
 			}
 			localF = localFR;
 		}
-		System.out.print("\n");
+		if (logRegime == true && logType.equals("console"))
+		{
+			System.out.print("\n");
+		}
+		else if (logRegime == true && logType.equals("file"))
+		{
+			try
+			{
+				writer.write("\n");
+			}
+			catch (Exception ex)
+			{
+				System.out.println(ex.getMessage());
+			}
+			finally
+			{
+				if (fm != null && writer != null)
+				{
+					fm.close();
+					writer.close();
+				}
+			}
+		}
+		else if (logRegime == true && logType.equals("all"))
+		{
+			System.out.print("\n");
+			
+			try
+			{
+				writer.write("\n");
+			}
+			catch (Exception ex)
+			{
+				System.out.println(ex.getMessage());
+			}
+			finally
+			{
+				if (fm != null && writer != null)
+				{
+					fm.close();
+					writer.close();
+				}
+			}
+		}
 	}
 	
 	// --------------------------------------------------
@@ -1821,7 +2446,7 @@ public class ResolutionFunction
 	 * ???
 	 * @author MatmanBJ
 	 */
-	public void ResolutionAllUniquePredicate ()
+	public void ResolutionAllUniquePredicate () throws Exception
 	{
 		int i;
 		int j;
@@ -1913,6 +2538,8 @@ public class ResolutionFunction
 								localNewDisjunct.SortPredicate();
 								
 								localFR.SetDisjuncts(localNewDisjunct);
+								safeNumber = safeNumber + 1;
+								ResolutionFunction.SafeCheck(safeRegime, safeNumber, safeType);
 								
 								if (localNewDisjunct.GetEmpty() && repeat == true)
 								{
@@ -1947,7 +2574,7 @@ public class ResolutionFunction
 		}
 	}
 	
-	public void ResolutionAllUniquePredicateOne ()
+	public void ResolutionAllUniquePredicateOne () throws Exception
 	{
 		int i;
 		int j;
@@ -2060,6 +2687,8 @@ public class ResolutionFunction
 								}*/
 								
 								localFR.SetDisjuncts(localNewDisjunct);
+								safeNumber = safeNumber + 1;
+								ResolutionFunction.SafeCheck(safeRegime, safeNumber, safeType);
 								
 								if (localNewDisjunct.GetEmpty() && repeat == true)
 								{

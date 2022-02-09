@@ -1,7 +1,7 @@
 // Alternative exam -- 4 term
 // © Matthew Sobolewski and Victor Stepovik
 // "A GIANT OF THOUHT, A FATHER OF RUSSIAN RES(V)OLUTION"
-// Resolution method version alpha 0.29
+// Resolution method version beta 0.30
 // Updates:
 // -- try/catch/finally added for the main class (with lists of potential commands)
 // -- each iteration demonstration added (only for "all number" method)
@@ -21,17 +21,34 @@ import java.util.Scanner;
 /**
  * Main class "ResolutionMethod"
  * @author MatmanBJ
- * @version alpha 0.29
+ * @version beta 0.30
  */
 public class ResolutionMethod
 {
 	private static List<String> logicList = Arrays.asList("statement", "predicate");
 	private static List<String> inputList = Arrays.asList("console", "file");
-	private static List<String> treatmentList = Arrays.asList("saturation", "preference", "strikeout", "strategies demonstration", "all", "all number", "all find", "idz", "all unique", "semantic");
-	private static List<String> treatmentListPredicate = Arrays.asList("all unique");
+	private static List<String> flagList = Arrays.asList("-l", "-s");
+	private static List<String> treatmentList = Arrays.asList("saturation", "preference", "strikeout", "strategies_demonstration", "all", "all_number", "all_find", "idz", "all_unique", "semantic");
+	private static List<String> treatmentListPredicate = Arrays.asList("all_unique");
 	private static List<String> outputList = Arrays.asList("console", "file", "console file", "file console", "all", "none");
 	
-	public static void StrategiesDemonstration (ResolutionFunction localLocalRF) // resolution strategy demonstrations
+	public static boolean isNumber (String str)
+	{
+	    if (str == null || str.isEmpty())
+	    {
+	    	return false;
+	    }
+	    for (int i = 0; i < str.length(); i++)
+	    {
+	        if (!Character.isDigit(str.charAt(i)))
+	        {
+	        	return false;
+	        }
+	    }
+	    return true;
+	}
+	
+	public static void StrategiesDemonstration (ResolutionFunction localLocalRF) throws Exception // resolution strategy demonstrations
 	{
 		// I STOPPED HERE
 		ResolutionFunction localStrategy;
@@ -61,7 +78,7 @@ public class ResolutionMethod
 		localStrategy.GetFunction();
 	}
 	
-	public static ResolutionFunction TreatmentMain (String localString, ResolutionFunction localRF)
+	public static ResolutionFunction TreatmentMain (String localString, ResolutionFunction localRF) throws Exception
 	{
 		if (localString.equals("saturation"))
 		{
@@ -75,7 +92,7 @@ public class ResolutionMethod
 		{
 			localRF.ResolutionStrikeout();
 		}
-		else if (localString.equals("strategies demonstration"))
+		else if (localString.equals("strategies_demonstration"))
 		{
 			StrategiesDemonstration(localRF);
 		}
@@ -83,7 +100,7 @@ public class ResolutionMethod
 		{
 			localRF.ResolutionAll();
 		}
-		else if (localString.equals("all number"))
+		else if (localString.equals("all_number"))
 		{
 			Scanner inputScanner = new Scanner(System.in);
 			System.out.println("Please write number of iterations:");
@@ -92,7 +109,7 @@ public class ResolutionMethod
 			
 			localRF.ResolutionAllNumber(localIters);
 		}
-		else if (localString.equals("all find"))
+		else if (localString.equals("all_find"))
 		{
 			localRF.ResolutionAllFind();
 		}
@@ -100,7 +117,7 @@ public class ResolutionMethod
 		{
 			localRF.ResolutionIDZ();
 		}
-		else if (localString.equals("all unique"))
+		else if (localString.equals("all_unique"))
 		{
 			localRF.ResolutionAllUnique();
 		}
@@ -108,7 +125,7 @@ public class ResolutionMethod
 		{
 			localRF.ResolutionSemantic();
 		}
-		else if (localString.equals("semantic test"))
+		else if (localString.equals("semantic_test"))
 		{
 			// NOTHING YET
 		}
@@ -119,9 +136,9 @@ public class ResolutionMethod
 		return localRF;
 	}
 	
-	public static ResolutionFunction TreatmentMainPredicate (String localString, ResolutionFunction localRF)
+	public static ResolutionFunction TreatmentMainPredicate (String localString, ResolutionFunction localRF) throws Exception
 	{
-		if (localString.equals("all unique"))
+		if (localString.equals("all_unique"))
 		{
 			localRF.ResolutionAllUniquePredicate();
 		}
@@ -325,6 +342,12 @@ public class ResolutionMethod
 			
 			ResolutionDisjunct.SetMaxID();
 			
+			//ResolutionFunction.SetLogRegime(false);
+			//ResolutionFunction.SetLogType("none");
+			//ResolutionFunction.SetSafeRegime(false);
+			//ResolutionFunction.SetSafeType(1000);
+			ResolutionFunction.SetSafeNumber(0);
+			
 			try
 			{
 				System.out.println("Please write type of logic (<type>):");
@@ -342,10 +365,56 @@ public class ResolutionMethod
 				}
 				
 				System.out.println("Please write type of treatment (<type>):");
-				typeTreatment = inputScanner.nextLine();
-				if ((treatmentList.contains(typeTreatment) == false) && (treatmentListPredicate.contains(typeTreatment) == false))
+				String localTypeTreatment [] = inputScanner.nextLine().split("\\s");
+				typeTreatment = localTypeTreatment[0];
+				if (localTypeTreatment.length == 1)
 				{
-					throw new Exception("Wrong type of treatment for your logic type!");
+					//typeTreatment = inputScanner.nextLine();
+					if ((treatmentList.contains(typeTreatment) == false) && (treatmentListPredicate.contains(typeTreatment) == false))
+					{
+						throw new Exception("Wrong type of treatment for your logic type!");
+					}
+				}
+				else
+				{
+					if ((treatmentList.contains(typeTreatment) == false) && (treatmentListPredicate.contains(typeTreatment) == false))
+					{
+						throw new Exception("Wrong type of treatment for your logic type!");
+					}
+					if (localTypeTreatment[1].equals(flagList.get(0)) && (localTypeTreatment[2].equals("console") || localTypeTreatment[2].equals("file") || localTypeTreatment[2].equals("all") || localTypeTreatment[2].equals("none")))
+					{
+						if (localTypeTreatment[2].equals("none") == false)
+						{
+							ResolutionFunction.SetLogRegime(true);
+							ResolutionFunction.SetLogType(localTypeTreatment[2]);
+						}
+						else
+						{
+							ResolutionFunction.SetLogRegime(false);
+							ResolutionFunction.SetLogType(localTypeTreatment[2]);
+						}
+					}
+					else
+					{
+						throw new Exception("Wrong type of flag/flags or wrong type of flag/flags order!");
+					}
+					if (localTypeTreatment[3].equals(flagList.get(1)) && (Integer.parseInt(localTypeTreatment[4])) == (int)(Integer.parseInt(localTypeTreatment[4])) /*ResolutionMethod.isNumber(localTypeTreatment[4])*/)
+					{
+						if (localTypeTreatment[4].equals("-1") == false)
+						{
+							ResolutionFunction.SetSafeRegime(true);
+							ResolutionFunction.SetSafeType(Integer.parseInt(localTypeTreatment[4]));
+						}
+						else
+						{
+							ResolutionFunction.SetSafeRegime(false);
+							ResolutionFunction.SetSafeType(Integer.parseInt(localTypeTreatment[4]));
+						}
+					}
+					else
+					{
+						throw new Exception("Wrong type of flag/flags or wrong type of flag/flags order!");
+					}
 				}
 				
 				System.out.println("Please write type of output (<type 1> or <type 1> <type 2> or all):");
@@ -358,13 +427,31 @@ public class ResolutionMethod
 				if (typeLogic.equals("statement"))
 				{
 					localFunction = InputMain(typeInput);
-					localFunction = TreatmentMain(typeTreatment, localFunction);
+					try
+					{
+						localFunction = TreatmentMain(typeTreatment, localFunction);
+					}
+					catch (Exception excp)
+					{
+						System.out.println("\n---------- SAFE REGIME ----------");
+						System.out.println(excp.getMessage());
+						System.out.println("------------------------------\n");
+					}
 					OutputMain(localFunction, typeOutput);
 				}
 				else if (typeLogic.equals("predicate"))
 				{
 					localFunction = InputMainPredicate(typeInput);
-					localFunction = TreatmentMainPredicate(typeTreatment, localFunction);
+					try
+					{
+						localFunction = TreatmentMainPredicate(typeTreatment, localFunction);
+					}
+					catch (Exception excp)
+					{
+						System.out.println("\n---------- SAFE REGIME ----------");
+						System.out.println(excp.getMessage());
+						System.out.println("------------------------------\n");
+					}
 					OutputMainPredicate(localFunction, typeOutput);
 				}
 				
