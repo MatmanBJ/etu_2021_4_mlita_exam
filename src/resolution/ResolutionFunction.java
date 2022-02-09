@@ -14,7 +14,7 @@ import java.lang.Object.*;
  * By default, it is commonly prepared for the resolution.
  * A function contains a list with disjuncts.
  * @author MatmanBJ
- * @version alpha 0.27
+ * @version alpha 0.28
  */
 public class ResolutionFunction
 {
@@ -1493,29 +1493,15 @@ public class ResolutionFunction
 		int j;
 		int k;
 		int l;
-		int c;
-		
-		int c1 = 0;
-		int c2 = 0;
-		int c3 = 0;
-		int c4 = 0;
+		int c1 = 0; // last/new index number for TRUE set
+		int c2 = 0; // last/new index number for FALSE set
+		int iter = 0; // number of iteration
 		boolean repeat = true;
-		boolean stop = false;
-		
-		//ArrayList<ResolutionDisjunct> localTrue = new ArrayList<ResolutionDisjunct>();
-		//ArrayList<ResolutionDisjunct> localFalse = new ArrayList<ResolutionDisjunct>();
-		/*ArrayList<Interpretation> localInterpretation = new ArrayList<Interpretation>();
-		
-		for (ResolutionDisjunct p : disjuncts)
-		{
-			for (ResolutionVariable q : p.GetVariables())
-			{
-				if (localInterpretation.contains(q.GetName()) == false)
-				{
-					localInterpretation.add(new Interpretation(q.GetName()));
-				}
-			}
-		}*/
+		this.SortD();
+		this.RefreshD();
+		ResolutionFunction localTrue = new ResolutionFunction();
+		ResolutionFunction localFalse = new ResolutionFunction();
+		ResolutionFunction localF = new ResolutionFunction();
 		
 		ArrayList<String> localInterpretation = new ArrayList<String>(); // only "true" interpretation
 		for (ResolutionDisjunct p : disjuncts)
@@ -1529,27 +1515,21 @@ public class ResolutionFunction
 			}
 		}
 		
-		this.SortD();
-		this.RefreshD();
-		ResolutionFunction localTrue = new ResolutionFunction();
-		ResolutionFunction localFalse = new ResolutionFunction();
-		
-		ResolutionFunction localF = new ResolutionFunction();
 		localF.GetDisjuncts().addAll(disjuncts);
 		disjuncts.removeAll(disjuncts);
-		
 		System.out.println("+---------------------------------------+---------------------------------------+");
 		System.out.format("|%-39s|%-39s|", "TRUE INTERPRETATION", "FALSE INTERPRETATION");
-		System.out.println("\n+---------------------------------------+---------------------------------------+");
-		
-		int iter = 1;
+		System.out.print("\n+---------------------------------------+---------------------------------------+");
 		
 		while (repeat == true)
 		{
-			ResolutionFunction localLocalTrue = new ResolutionFunction();
-			ResolutionFunction localLocalFalse = new ResolutionFunction();
 			ResolutionFunction localFR = new ResolutionFunction();
-			int d = disjuncts.size();
+			localF.Refresh();
+			
+			iter = iter + 1;
+			System.out.println("\n+---------------------------------------+---------------------------------------+");
+			System.out.format("|%-79s|", "ITERATION " + iter);
+			System.out.println("\n+---------------------------------------+---------------------------------------+");
 			
 			for (i = 0; i < localF.GetDisjuncts().size(); i++)
 			{
@@ -1574,37 +1554,25 @@ public class ResolutionFunction
 					localFalse.GetDisjuncts().add(localF.GetDisjuncts().get(i));
 				}
 			}
-			System.out.println("+---------------------------------------+---------------------------------------+");
-			System.out.format("|%-79s|", "ITERATION " + iter);
-			System.out.println("\n+---------------------------------------+---------------------------------------+");
-			iter = iter + 1;
 			localTrue.Refresh();
 			localFalse.Refresh();
-			//System.out.format("%32s %10d %16s", "hhh", 22, "dd");
+			
 			int c5;
 			int c6;
-			if (localTrue.GetDisjuncts().size() - c3 > localFalse.GetDisjuncts().size() - c4)
+			if (localTrue.GetDisjuncts().size() - c1 > localFalse.GetDisjuncts().size() - c2)
 			{
 				c5 = c1;
-				//c5 = c3;
 				c6 = localTrue.GetDisjuncts().size();
 			}
 			else
 			{
-				//c5 = c4;
 				c5 = c2;
 				c6 = localFalse.GetDisjuncts().size();
 			}
 			int ind1 = c1;
 			int ind2 = c2;
-			//int ind1 = c3;
-			//int ind2 = c4;
 			for (i = c5; i < c6; i++)
 			{
-				/*if (ind1 >= localTrue.GetDisjuncts().size() && ind2 >= localFalse.GetDisjuncts().size())
-				{
-					
-				}*/
 				if (ind1 >= localTrue.GetDisjuncts().size())
 				{
 					System.out.format("|%-39s|%-39s|", "", localFalse.GetDisjuncts().get(ind2).toOutputStringOnly(ind2 + 1));
@@ -1628,28 +1596,14 @@ public class ResolutionFunction
 					System.out.print("\n");
 				}
 			}
-			//System.out.format("%32s %10d %16s", "hhh", 22, "dd");
-			//System.out.println("+---------------------------------------+---------------------------------------+");
-			////System.out.println("TRUE");
-			////localTrue.GetFunction();
-			////System.out.println("FALSE");
-			////localFalse.GetFunction();
-			//localF.Refresh();
-			//disjuncts.addAll(localF.GetDisjuncts());
-
-			//this.Refresh(); // it's only here, because at the end it doesn't work
+			//System.out.println("TRUE");
+			//localTrue.GetFunction();
+			//System.out.println("FALSE");
+			//localFalse.GetFunction();
 			for (i = 0; i < localTrue.GetDisjuncts().size(); i++)
 			{
 				ResolutionDisjunct localDisjunct = localTrue.GetDisjuncts().get(i);
 				ArrayList<ResolutionVariable> variables = localDisjunct.GetVariables();
-				/*if (i < d)
-				{
-					c = d;
-				}
-				else
-				{
-					c = i + 1;
-				}*/
 				for (j = c2; j < localFalse.GetDisjuncts().size(); j++)
 				{
 					ResolutionDisjunct localDisjunctTwo = localFalse.GetDisjuncts().get(j);
@@ -1679,11 +1633,6 @@ public class ResolutionFunction
 								localNewDisjunct.Refresh();
 								localNewDisjunct.Sort();
 								
-								if (localNewDisjunct.GetEmpty() == true)
-								{
-									stop = true;
-								}
-								
 								localFR.SetDisjuncts(localNewDisjunct);
 							}
 						}
@@ -1694,14 +1643,6 @@ public class ResolutionFunction
 			{
 				ResolutionDisjunct localDisjunct = localTrue.GetDisjuncts().get(i);
 				ArrayList<ResolutionVariable> variables = localDisjunct.GetVariables();
-				/*if (i < d)
-				{
-					c = d;
-				}
-				else
-				{
-					c = i + 1;
-				}*/
 				for (j = 0; j < localFalse.GetDisjuncts().size(); j++)
 				{
 					ResolutionDisjunct localDisjunctTwo = localFalse.GetDisjuncts().get(j);
@@ -1731,19 +1672,12 @@ public class ResolutionFunction
 								localNewDisjunct.Refresh();
 								localNewDisjunct.Sort();
 								
-								if (localNewDisjunct.GetEmpty() == true)
-								{
-									stop = true;
-								}
-								
 								localFR.SetDisjuncts(localNewDisjunct);
 							}
 						}
 					}
 				}
 			}
-			c3 = c1;
-			c4 = c2;
 			c1 = localTrue.GetDisjuncts().size();
 			c2 = localFalse.GetDisjuncts().size();
 			if(localFR.GetDisjuncts().size() == 0)
@@ -1754,6 +1688,7 @@ public class ResolutionFunction
 			}
 			localF = localFR;
 		}
+		System.out.print("\n");
 	}
 	
 	// --------------------------------

@@ -1,6 +1,6 @@
 // Alternative exam -- 4 term
 // © Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.25
+// Resolution method version alpha 0.28
 // Updates:
 // -- FILE OUTPUT IS UNUPDATED
 // -- Some methods has been updated
@@ -15,7 +15,7 @@ import java.util.HashSet;
 /**
  * Main class "ResolutionMethod"
  * @author MatmanBJ
- * @version alpha 0.27
+ * @version alpha 0.28
  */
 public class ResolutionMethod
 {
