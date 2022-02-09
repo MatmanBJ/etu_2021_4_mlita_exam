@@ -11,7 +11,7 @@ import java.util.Comparator;
  * Variables and predicates can be sorted (in alphabet order) and refreshed (deleted repeated vars/preds, changed to 1 or empty disjunct).
  * A disjunct containing an information about id, contrary parents, list of vars/preds (in order).
  * @author MatmanBJ
- * @version alpha 0.21
+ * @version alpha 0.22
  */
 public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 {
@@ -42,10 +42,10 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		maxID = maxID + 1;
 		parents[0] = 0;
 		parents[1] = 0;
-		contrary = "0";
+		contrary = new String("0");
 	}
 	
-	public ResolutionDisjunct (ArrayList<ResolutionVariable> localResolutionVariable) // special constructor
+	public ResolutionDisjunct (ArrayList<ResolutionVariable> localResolutionVariable) // special constructor for statements
 	{
 		one = false;
 		empty = false;
@@ -54,10 +54,10 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		maxID = maxID + 1;
 		parents[0] = 0;
 		parents[1] = 0;
-		contrary = "0";
+		contrary = new String("0");
 	}
 	
-	public ResolutionDisjunct (ArrayList<ResolutionPredicate> localResolutionPredicate, int localInt) // special constructor
+	public ResolutionDisjunct (ArrayList<ResolutionPredicate> localResolutionPredicate, int localInt) // special constructor for predicates
 	{
 		one = false;
 		empty = false;
@@ -66,14 +66,17 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		maxID = maxID + 1;
 		parents[0] = 0;
 		parents[1] = 0;
-		contrary = "0";
+		contrary = new String("0");
 	}
 	
-	public ResolutionDisjunct (ResolutionDisjunct localDisjunct)
+	public ResolutionDisjunct (ResolutionDisjunct localDisjunct) // deep copy constructor
 	{
 		one = localDisjunct.GetOne();
 		empty = localDisjunct.GetEmpty();
-		//predicates.addAll(new ArrayList<ResolutionPredicate>(localDisjunct.GetPredicates()));
+		for (ResolutionVariable p : localDisjunct.GetVariables())
+		{
+			variables.add(new ResolutionVariable(p));
+		}
 		for (ResolutionPredicate p : localDisjunct.GetPredicates())
 		{
 			predicates.add(new ResolutionPredicate(p));
@@ -105,7 +108,7 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 	}
 	public void SetContrary (String localContrary)
 	{
-		contrary = localContrary;
+		contrary = new String(localContrary);
 	}
 	public void SetVariables (ResolutionVariable localVariables)
 	{
@@ -180,13 +183,12 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		{
 			for (int j = i + 1; j < variables.size(); j++)
 			{
-				if (variables.get(i).equals(variables.get(j)))
+				if ((variables.get(i).GetName().equals(variables.get(j).GetName())) && (variables.get(i).GetDenial() == variables.get(j).GetDenial()))
 				{
 					variables.remove(j);
 					j = j - 1;
 				}
-				else if ((variables.get(i).GetName().equals(variables.get(j).GetName()))
-						&& (variables.get(i).GetDenial() != variables.get(j).GetDenial()))
+				else if ((variables.get(i).GetName().equals(variables.get(j).GetName())) && (variables.get(i).GetDenial() != variables.get(j).GetDenial()))
 				{
 					variables.removeAll(variables);
 					this.SetOne(true);
@@ -227,13 +229,12 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		{
 			for (int j = i + 1; j < predicates.size(); j++)
 			{
-				if (predicates.get(i).equals(predicates.get(j)))
+				if ((predicates.get(i).equals(predicates.get(j))) && (predicates.get(i).GetDenial() == predicates.get(j).GetDenial()))
 				{
 					predicates.remove(j);
 					j = j - 1;
 				}
-				else if ((predicates.get(i).GetName().equals(predicates.get(j).GetName()))
-						&& (predicates.get(i).GetDenial() != predicates.get(j).GetDenial()))
+				else if ((predicates.get(i).equals(predicates.get(j))) && (predicates.get(i).GetDenial() != predicates.get(j).GetDenial()))
 				{
 					predicates.removeAll(predicates);
 					this.SetOne(true);

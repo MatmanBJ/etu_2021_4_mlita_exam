@@ -1,13 +1,10 @@
 // Alternative exam -- 4 term
 // © Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.19
+// Resolution method version alpha 0.22
 // Updates:
-// -- Full predicate input added
-// -- Greek alphabet and special symbols to copy added
-// -- ID and disjunct (at one time) number added
-// -- Output inverse ("!") type fixed and updated
-// -- Input minor fixes
-// -- Javadoc documentation added
+// -- Deep copy constructors added for each valuable class
+// -- New string construction in each constructor and setter added for every class
+// -- Nakonetsto zdelal logiku predikatov
 
 package resolution;
 
@@ -19,7 +16,7 @@ import java.util.HashSet;
 /**
  * Main class "ResolutionMethod"
  * @author MatmanBJ
- * @version alpha 0.21
+ * @version alpha 0.22
  */
 public class ResolutionMethod
 {
@@ -112,7 +109,6 @@ public class ResolutionMethod
 		d_func.SetDisjuncts(d_five);
 		d_func.SetDisjuncts(d_six);
 		
-		d_func.ResolutionHash();
 		//d_func.ResolutionFind();
 		//d_func.Resolution();
 		d_func.GetFunction();
@@ -122,6 +118,12 @@ public class ResolutionMethod
 	{
 		// I STOPPED HERE
 		ResolutionFunction localStrategy;
+		System.out.println("---------- ALL UNIQUE STRATEGY ----------");
+		ResolutionDisjunct.SetMaxID();
+		localStrategy = new ResolutionFunction ();
+		localStrategy.ResolutionFileInput("example_theory.txt");
+		localStrategy.ResolutionAllUnique();
+		localStrategy.GetFunction();
 		System.out.println("---------- SATURATION STRATEGY ----------");
 		ResolutionDisjunct.SetMaxID();
 		localStrategy = new ResolutionFunction ();
@@ -167,10 +169,6 @@ public class ResolutionMethod
 		{
 			localRF.ResolutionFind();
 		}
-		else if (localString.equals("hash")) // technical, not for common usage
-		{
-			localRF.ResolutionHash();
-		}
 		else if (localString.equals("unique")) // technical, not for common usage
 		{
 			localRF.ResolutionAllUnique();
@@ -195,7 +193,6 @@ public class ResolutionMethod
 			Scanner inputScanner = new Scanner(System.in);
 			System.out.println("Please write file name(<file name>):");
 			String localFS = inputScanner.nextLine();
-			//cons.ResolutionFileInputExample("example.txt");
 			cons.ResolutionFileInput(localFS);
 		}
 		else
@@ -218,11 +215,7 @@ public class ResolutionMethod
 			System.out.println("Please write file name and specification (<file name> <specification>):");
 			String localFS = outputScanner.nextLine();
 			String localFSArray [] = localFS.split("\\s");
-			if (localFSArray[1].equals("example"))
-			{
-				localOutput.ResolutionFileExample("example_" + localFSArray[0]);
-			}
-			else if (localFSArray[1].equals("readable"))
+			if (localFSArray[1].equals("readable"))
 			{
 				localOutput.ResolutionFileReadable("readable_" + localFSArray[0]);
 			}
@@ -243,11 +236,7 @@ public class ResolutionMethod
 			System.out.println("Please write file name and specification (<file name> <specification>):");
 			String localFS = outputScanner.nextLine();
 			String localFSArray [] = localFS.split("\\s");
-			if (localFSArray[1].equals("example"))
-			{
-				localOutput.ResolutionFileExample("example_" + localFSArray[0]);
-			}
-			else if (localFSArray[1].equals("readable"))
+			if (localFSArray[1].equals("readable"))
 			{
 				localOutput.ResolutionFileReadable("readable_" + localFSArray[0]);
 			}
@@ -267,7 +256,6 @@ public class ResolutionMethod
 			Scanner outputScanner = new Scanner(System.in);
 			System.out.println("Please write file name (<file name>):");
 			String localFS = outputScanner.nextLine();
-			localOutput.ResolutionFileExample("example_" + localFS);
 			localOutput.ResolutionFileReadable("readable_" + localFS);
 			localOutput.ResolutionFileUnreadable("unreadable_" + localFS);
 		}
@@ -309,7 +297,6 @@ public class ResolutionMethod
 			{
 				localFunction = InputMain(typeInput);
 				localFunction = TreatmentMain(typeTreatment, localFunction);
-				//localFunction.ResolutionHash();
 				//localFunction.ResolutionAllUnique();
 				OutputMain(localFunction, typeOutput);
 			}

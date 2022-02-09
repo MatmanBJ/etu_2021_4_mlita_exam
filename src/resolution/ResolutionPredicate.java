@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * Resolution predicate class.
  * @author MatmanBJ
- * @version alpha 0.21
+ * @version alpha 0.22
  */
 public class ResolutionPredicate
 {
@@ -29,15 +29,13 @@ public class ResolutionPredicate
 	public ResolutionPredicate (boolean localDenial, String localName) // special constructor
 	{
 		denial = localDenial;
-		name = localName;
+		name = new String(localName);
 	}
 	
-	public ResolutionPredicate (ResolutionPredicate localPredicate)
+	public ResolutionPredicate (ResolutionPredicate localPredicate) // deep copy constructor
 	{
 		denial = localPredicate.GetDenial();
 		name = new String(localPredicate.GetName());
-		//terms = new ArrayList<ResolutionTerm>(localPredicate.GetTerms());
-		//terms.addAll(localPredicate.GetTerms());
 		for (ResolutionTerm p : localPredicate.GetTerms())
 		{
 			terms.add(new ResolutionTerm(p));
@@ -52,7 +50,7 @@ public class ResolutionPredicate
 	}
 	public void SetName (String localName)
 	{
-		name = localName;
+		name = new String(localName);
 	}
 	public void SetTerms (ResolutionTerm localResolutionTerm)
 	{
@@ -87,17 +85,10 @@ public class ResolutionPredicate
 	public static boolean unification (ResolutionPredicate localPredicateThis, ResolutionDisjunct localDisjunctThis, ResolutionPredicate localPredicate, ResolutionDisjunct localDisjunct)
 	{
 		boolean localEquality;
-		//System.out.println(localPredicateThis.GetName() + " " + localPredicate.GetName() + " " + localPredicateThis.GetTerms().size() + " " + localPredicate.GetTerms().size());
 		if (localPredicateThis.GetName().equals(localPredicate.GetName()) && localPredicateThis.GetTerms().size() == localPredicate.GetTerms().size())
 		{
-			
 			localEquality = true;
 			ResolutionTerm [] localT = null;
-			
-			//localDisjunctThis = new ResolutionDisjunct (localDisjunctThis);
-			//localDisjunct = new ResolutionDisjunct (localDisjunct);
-			//localPredicateThis = new ResolutionPredicate (localPredicateThis);
-			//localPredicate = new ResolutionPredicate (localPredicate);
 			
 			for (int x = 0; x < localPredicateThis.GetTerms().size(); x++)
 			{
@@ -114,20 +105,15 @@ public class ResolutionPredicate
 							localEquality = false;
 							x = localPredicateThis.GetTerms().size();
 						}
-						else
+						else if (localT[0].equals(localT[1]) == false)
 						{
-							if (localT[0].equals(localT[1]) == false)
+							for (ResolutionPredicate localPredicateLoop : localDisjunctThis.GetPredicates())
 							{
-								for (int y = 0; y < localDisjunctThis.GetPredicates().size(); y++)
-								{
-									//localPredicateThis.change(localT);
-									localDisjunctThis.GetPredicates().get(y).change(localT);
-								}
-								for (int z = 0; z < localDisjunct.GetPredicates().size(); z++)
-								{
-									//localPredicate.change(localT);
-									localDisjunct.GetPredicates().get(z).change(localT);
-								}
+								localPredicateLoop.change(localT);
+							}
+							for (ResolutionPredicate localPredicateLoop : localDisjunct.GetPredicates())
+							{
+								localPredicateLoop.change(localT);
 							}
 						}
 					}
@@ -142,8 +128,6 @@ public class ResolutionPredicate
 		{
 			localEquality = false;
 		}
-		////System.out.println(localPredicateThis.toStringPredicate());
-		////System.out.println(localPredicate.toStringPredicate());
 		return localEquality;
 	}
 	

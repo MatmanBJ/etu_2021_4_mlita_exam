@@ -3,7 +3,7 @@ package resolution;
 /**
  * Resolution variable class.
  * @author MatmanBJ
- * @version alpha 0.21
+ * @version alpha 0.22
  */
 public class ResolutionVariable
 {
@@ -26,7 +26,13 @@ public class ResolutionVariable
 	public ResolutionVariable (boolean localDenial, String localName) // special constructor
 	{
 		denial = localDenial;
-		name = localName;
+		name = new String(localName);
+	}
+	
+	public ResolutionVariable (ResolutionVariable localVariable) // deep copy constructor
+	{
+		denial = localVariable.GetDenial();
+		name = new String(localVariable.GetName());
 	}
 	
 	// ---------- SETTERS ----------
@@ -37,7 +43,7 @@ public class ResolutionVariable
 	}
 	public void SetName (String localName)
 	{
-		name = localName;
+		name = new String(localName);
 	}
 	
 	// ---------- GETTERS ----------
