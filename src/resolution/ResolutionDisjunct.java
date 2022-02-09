@@ -11,7 +11,7 @@ import java.util.Comparator;
  * Variables and predicates can be sorted (in alphabet order) and refreshed (deleted repeated vars/preds, changed to 1 or empty disjunct).
  * A disjunct containing an information about id, contrary parents, list of vars/preds (in order).
  * @author MatmanBJ
- * @version alpha 0.19
+ * @version alpha 0.21
  */
 public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 {
@@ -212,6 +212,38 @@ public class ResolutionDisjunct implements Comparable<ResolutionDisjunct>
 		        return v1.GetName().compareTo(v2.GetName());
 		    }
 		});
+	}
+	
+	/**
+	 * This method set current disjunct "in perfect order":
+	 * it deletes duplicate predicates,
+	 * mark the disjunct empty (if there is no predicates)
+	 * or make it equal "1" (if there are !predicate(...) + predicate(...)).
+	 * Pay attention: predicates with equal name, but different terms are different too!
+	 */
+	public void RefreshPredicate ()
+	{
+		for (int i = 0; i < predicates.size() - 1; i++)
+		{
+			for (int j = i + 1; j < predicates.size(); j++)
+			{
+				if (predicates.get(i).equals(predicates.get(j)))
+				{
+					predicates.remove(j);
+					j = j - 1;
+				}
+				else if ((predicates.get(i).GetName().equals(predicates.get(j).GetName()))
+						&& (predicates.get(i).GetDenial() != predicates.get(j).GetDenial()))
+				{
+					predicates.removeAll(predicates);
+					this.SetOne(true);
+				}
+			}
+		}
+		if (this.GetOne() == false && predicates.size() == 0)
+		{
+			this.SetEmpty(true);
+		}
 	}
 	
 	/**

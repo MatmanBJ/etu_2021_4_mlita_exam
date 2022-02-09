@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * Resolution predicate class.
  * @author MatmanBJ
- * @version alpha 0.19
+ * @version alpha 0.21
  */
 public class ResolutionPredicate
 {
@@ -105,20 +105,29 @@ public class ResolutionPredicate
 				
 				if (localEquality == true)
 				{
-					localT = localPredicateThis.GetTerms().get(x).unification(localPredicate.GetTerms().get(x));
+					localT = localPredicateThis.GetTerms().get(x).unification(localPredicate.GetTerms().get(x), localDisjunctThis, localDisjunct);
+					
 					if (localT != null)
 					{
-						if (localT[0].equals(localT[1]) == false)
+						if (localT.length == 10)
 						{
-							for (int y = 0; y < localDisjunctThis.GetPredicates().size(); y++)
+							localEquality = false;
+							x = localPredicateThis.GetTerms().size();
+						}
+						else
+						{
+							if (localT[0].equals(localT[1]) == false)
 							{
-								//localPredicateThis.change(localT);
-								localDisjunctThis.GetPredicates().get(y).change(localT);
-							}
-							for (int z = 0; z < localDisjunct.GetPredicates().size(); z++)
-							{
-								//localPredicate.change(localT);
-								localDisjunct.GetPredicates().get(z).change(localT);
+								for (int y = 0; y < localDisjunctThis.GetPredicates().size(); y++)
+								{
+									//localPredicateThis.change(localT);
+									localDisjunctThis.GetPredicates().get(y).change(localT);
+								}
+								for (int z = 0; z < localDisjunct.GetPredicates().size(); z++)
+								{
+									//localPredicate.change(localT);
+									localDisjunct.GetPredicates().get(z).change(localT);
+								}
 							}
 						}
 					}

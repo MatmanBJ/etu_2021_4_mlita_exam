@@ -14,7 +14,7 @@ import java.lang.Object.*;
  * By default, it is commonly prepared for the resolution.
  * A function contains a list with disjuncts.
  * @author MatmanBJ
- * @version alpha 0.19
+ * @version alpha 0.21
  */
 public class ResolutionFunction
 {
@@ -207,6 +207,19 @@ public class ResolutionFunction
 	}
 	
 	/**
+	 * This method consistently applies "SortPredicate" method from "ResolutionDisjunct" class for each disjunct in the function.
+	 * @see {@link resolution.ResolutionDisjunct#SortPredicate() SortPredicate()}
+	 * @see {@link resolution.ResolutionDisjunct ResolutionDisjunct}
+	 */
+	public void SortDPredicate ()
+	{
+		for (int i = 0; i < disjuncts.size(); i++)
+		{
+			disjuncts.get(i).SortPredicate();
+		}
+	}
+	
+	/**
 	 * This method consistently applies "Refresh" method from "ResolutionDisjunct" class for each disjunct in the function.
 	 * @see {@link resolution.ResolutionDisjunct#Refresh() Refresh()}
 	 * @see {@link resolution.ResolutionDisjunct ResolutionDisjunct}
@@ -219,6 +232,19 @@ public class ResolutionFunction
 		for (int i = 0; i < disjuncts.size(); i++)
 		{
 			disjuncts.get(i).Refresh();
+		}
+	}
+	
+	/**
+	 * This method consistently applies "RefreshPredicate" method from "ResolutionDisjunct" class for each disjunct in the function.
+	 * @see {@link resolution.ResolutionDisjunct#RefreshPredicate() RefreshPredicate()}
+	 * @see {@link resolution.ResolutionDisjunct ResolutionDisjunct}
+	 */
+	public void RefreshDPredicate ()
+	{
+		for (int i = 0; i < disjuncts.size(); i++)
+		{
+			disjuncts.get(i).RefreshPredicate();
 		}
 	}
 	
@@ -1394,17 +1420,17 @@ public class ResolutionFunction
 		ResolutionFunction localF = new ResolutionFunction();
 		localF.GetDisjuncts().addAll(disjuncts);
 		disjuncts.removeAll(disjuncts);
-		//this.RefreshD();
-		//this.SortD();
+		this.RefreshDPredicate();
+		this.SortDPredicate();
 		//this.Refresh();
 		while (repeat == true)
 		{
 			ResolutionFunction localFR = new ResolutionFunction();
 			int d = disjuncts.size();
-			//localF.SortD(); // the order is important
+			localF.SortDPredicate(); // the order is important
 			//localF.Refresh();
 			disjuncts.addAll(localF.GetDisjuncts());
-			//this.SortD(); // the order is important
+			this.SortDPredicate(); // the order is important
 			//this.Refresh(); // it's only here, because at the end it doesn't work
 			for (i = 0; i < disjuncts.size() - 1; i++)
 			{
@@ -1459,8 +1485,8 @@ public class ResolutionFunction
 							{
 								ResolutionDisjunct localNewDisjunct = new ResolutionDisjunct();
 								
-								System.out.println(localNewDisjunctOne.toStringPredicate());
-								System.out.println(localNewDisjunctTwo.toStringPredicate());
+								//System.out.println(localNewDisjunctOne.toStringPredicate());
+								//System.out.println(localNewDisjunctTwo.toStringPredicate());
 								//System.out.println(localNewDisjunctOne.GetPredicates().size() + " " + localNewDisjunctTwo.GetPredicates().size());
 								
 								localNewDisjunct.GetPredicates().addAll(localNewDisjunctOne.GetPredicates());
@@ -1475,13 +1501,18 @@ public class ResolutionFunction
 								
 								localNewDisjunct.SetContrary(String.valueOf(localVariable.GetName())); // set parent's contrary variable
 								
-								//localNewDisjunct.Refresh();
-								//localNewDisjunct.Sort();
+								localNewDisjunct.RefreshPredicate();
+								localNewDisjunct.SortPredicate();
 								
 								localFR.SetDisjuncts(localNewDisjunct);
 								
 								//System.out.println(localNewDisjunct.GetPredicates().size());
-								System.out.println(localNewDisjunct.toStringPredicate());
+								//System.out.println(localNewDisjunct.toStringPredicate());
+								
+								/*if (localNewDisjunct.GetEmpty())
+								{
+									repeat = false;
+								}*/
 							}
 							/*if ((localVariable.GetName().equals(localVariableTwo.GetName())) && (localVariable.GetDenial() != localVariableTwo.GetDenial()))
 							{

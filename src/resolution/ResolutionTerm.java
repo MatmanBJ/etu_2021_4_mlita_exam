@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * but they can have term type (constants, variables and functions) and terms list (only for functions).
  * Terms [instead of predicates and "classic" statement-logic variables] in the predicate (and in the functions) can't change their place.
  * @author MatmanBJ
- * @version alpha 0.19
+ * @version alpha 0.21
  */
 public class ResolutionTerm
 {
@@ -142,53 +142,6 @@ public class ResolutionTerm
 		return localEquality;
 	}
 	
-	public void localUnification (ResolutionTerm localRTThis, ResolutionTerm localRT)
-	{
-		ResolutionTerm localUnificationTerm;
-		boolean localEquality = true;
-		if ((localRTThis.GetTerm().equals(ResolutionTerm.GetVariable()) && localRT.GetTerm().equals(ResolutionTerm.GetVariable()))
-				|| (localRTThis.GetTerm().equals(ResolutionTerm.GetVariable()) && localRT.GetTerm().equals(ResolutionTerm.GetConstant()))
-				|| (localRTThis.GetTerm().equals(ResolutionTerm.GetConstant()) && localRT.GetTerm().equals(ResolutionTerm.GetVariable()))
-				|| (localRTThis.GetTerm().equals(ResolutionTerm.GetConstant()) && localRT.GetTerm().equals(ResolutionTerm.GetConstant())
-				&& localRTThis.GetName().equals(localRT.GetName())))
-		{
-			localEquality = true;
-		}
-		else if (false)
-		{
-			
-		}
-		else if (localRTThis.GetTerm().equals(ResolutionTerm.GetFunction()) && localRT.equals(ResolutionTerm.GetFunction())
-				&& localRTThis.GetName().equals(localRT.GetName()) && localRTThis.GetTerms().size() == localRT.GetTerms().size())
-		{
-			localEquality = true;
-			for (int x = 0; x < localRTThis.GetTerms().size(); x++)
-			{
-				if (localRTThis.GetTerms().get(x).pseudoEquals(localRT.GetTerms().get(x)))
-				{
-					localEquality = true;
-				}
-				else
-				{
-					localEquality = false;
-					x = localRTThis.GetTerms().size();
-				}
-			}
-		}
-		else if (localRTThis.GetTerm().equals(ResolutionTerm.GetVariable()) && localRT.equals(ResolutionTerm.GetFunction()))
-		{
-			localEquality = localRTThis.localFunctionCheck(localRT);
-		}
-		else if (localRTThis.GetTerm().equals(ResolutionTerm.GetFunction()) && localRT.equals(ResolutionTerm.GetVariable()))
-		{
-			localEquality = localRT.localFunctionCheck(localRTThis);
-		}
-		else
-		{
-			localEquality = false;
-		}
-	}
-	
 	public void change (ResolutionTerm [] localTerm)
 	{
 		if (this.GetTerms().size() == 0 && this.GetTerm().equals(ResolutionTerm.GetVariable()) && this.GetName().equals(localTerm[0].GetName()))
@@ -197,7 +150,7 @@ public class ResolutionTerm
 			this.SetTerm(localTerm[1].GetTerm());
 			this.GetTerms().addAll(localTerm[1].GetTerms());
 			//System.out.println(this.GetName() + " " + this.GetTerms().size());
-			System.out.println(this.GetName() + " " + localTerm[0].GetName() + " " + localTerm[1].GetName());
+			//System.out.println(this.GetName() + " " + localTerm[0].GetName() + " " + localTerm[1].GetName());
 		}
 		else if (this.GetTerms().size() > 0)
 		{
@@ -208,12 +161,10 @@ public class ResolutionTerm
 		}
 	}
 	
-	public ResolutionTerm [] unification (Object localObject)
+	public ResolutionTerm [] unification (Object localObject, ResolutionDisjunct localDisjunctOne, ResolutionDisjunct localDisjunctTwo)
 	{
 		ResolutionTerm localTerm = (ResolutionTerm) localObject;
 		ResolutionTerm [] localT = new ResolutionTerm[2];
-		//boolean localEquality;
-		//System.out.println("in if again");
 		if (this.GetTerm().equals(ResolutionTerm.GetVariable()) && localTerm.GetTerm().equals(ResolutionTerm.GetVariable()))
 		{
 			localT[0] = localTerm;
@@ -237,7 +188,18 @@ public class ResolutionTerm
 		else if (this.GetTerm().equals(ResolutionTerm.GetFunction()) && localTerm.GetTerm().equals(ResolutionTerm.GetFunction())
 				&& this.GetName().equals(localTerm.GetName()) && this.GetTerms().size() == localTerm.GetTerms().size())
 		{
-			localT = this.unification(localTerm);
+			boolean localSuccess = ResolutionTerm.unification(this, localDisjunctOne, localTerm, localDisjunctTwo);
+			if (localSuccess)
+			{
+				localT = null;
+			}
+			else
+			{
+				localT = new ResolutionTerm[10];
+			}
+			System.out.println(localSuccess);
+			//localT = null;
+			//localT = this.unification(localTerm);
 		}
 		else if (this.GetTerm().equals(ResolutionTerm.GetVariable()) && localTerm.GetTerm().equals(ResolutionTerm.GetFunction()))
 		{
@@ -259,6 +221,68 @@ public class ResolutionTerm
 			localT[1] = new ResolutionTerm(localT[1]);
 		}
 		return localT;
+	}
+	
+	// CHANGE NAME!!!
+	public static boolean unification (ResolutionTerm localPredicateThis, ResolutionDisjunct localDisjunctThis, ResolutionTerm localPredicate, ResolutionDisjunct localDisjunct)
+	{
+		boolean localEquality;
+		//System.out.println(localPredicateThis.GetName() + " " + localPredicate.GetName() + " " + localPredicateThis.GetTerms().size() + " " + localPredicate.GetTerms().size());
+		if (localPredicateThis.GetName().equals(localPredicate.GetName()) && localPredicateThis.GetTerms().size() == localPredicate.GetTerms().size())
+		{
+			
+			localEquality = true;
+			ResolutionTerm [] localT = null;
+			
+			//localDisjunctThis = new ResolutionDisjunct (localDisjunctThis);
+			//localDisjunct = new ResolutionDisjunct (localDisjunct);
+			//localPredicateThis = new ResolutionPredicate (localPredicateThis);
+			//localPredicate = new ResolutionPredicate (localPredicate);
+			
+			for (int x = 0; x < localPredicateThis.GetTerms().size(); x++)
+			{
+				localEquality = localPredicateThis.GetTerms().get(x).pseudoEquals(localPredicate.GetTerms().get(x));
+				
+				if (localEquality == true)
+				{
+					localT = localPredicateThis.GetTerms().get(x).unification(localPredicate.GetTerms().get(x), localDisjunctThis, localDisjunct);
+					
+					if (localT != null)
+					{
+						if (localT.length == 10)
+						{
+							localEquality = false;
+							x = localPredicateThis.GetTerms().size();
+						}
+						else
+						{
+							if (localT[0].equals(localT[1]) == false)
+							{
+								for (int y = 0; y < localDisjunctThis.GetPredicates().size(); y++)
+								{
+									//localPredicateThis.change(localT);
+									localDisjunctThis.GetPredicates().get(y).change(localT);
+								}
+								for (int z = 0; z < localDisjunct.GetPredicates().size(); z++)
+								{
+									//localPredicate.change(localT);
+									localDisjunct.GetPredicates().get(z).change(localT);
+								}
+							}
+						}
+					}
+				}
+				else
+				{
+					x = localPredicateThis.GetTerms().size();
+				}
+			}
+		}
+		else
+		{
+			localEquality = false;
+		}
+		return localEquality;
 	}
 	
 	public boolean pseudoEquals (Object localObject)

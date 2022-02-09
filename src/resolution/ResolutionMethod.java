@@ -19,7 +19,7 @@ import java.util.HashSet;
 /**
  * Main class "ResolutionMethod"
  * @author MatmanBJ
- * @version alpha 0.19
+ * @version alpha 0.21
  */
 public class ResolutionMethod
 {
