@@ -14,7 +14,7 @@ import java.lang.Object.*;
  * By default, it is commonly prepared for the resolution.
  * A function contains a list with disjuncts.
  * @author MatmanBJ
- * @version alpha 0.24
+ * @version alpha 0.25
  */
 public class ResolutionFunction
 {
@@ -35,7 +35,6 @@ public class ResolutionFunction
 	
 	public ResolutionFunction (String localJust) // special constructor for statements
 	{
-		int stop = 1;
 		Scanner localInputScanner = new Scanner(System.in);
 		System.out.println("Repeated and same disjuncts will be deleted!");
 		System.out.println("How many disjuncts do you want?");
@@ -94,8 +93,6 @@ public class ResolutionFunction
 	
 	public ResolutionFunction (int localJust) // special constructor for predicates
 	{
-		int stop = 1;
-		
 		char leftBrace = '(';
 		char rightBrace = ')';
 		
@@ -164,9 +161,9 @@ public class ResolutionFunction
 			this.GetOneDisjunctPredicate(i + 1);
 
 		}
-		//this.RefreshD();
-		//this.SortD();
-		//this.Refresh();
+		this.RefreshDPredicate();
+		this.SortDPredicate();
+		this.RefreshPredicate();
 		System.out.println("Current console input:");
 		this.GetFunctionPredicate();
 		System.out.print("\n");
@@ -638,34 +635,12 @@ public class ResolutionFunction
 		}
 	}
 	
-	public void ResolutionFileInputExample (String localFileName)
-	{
-		try(FileReader reader = new FileReader(localFileName))
-        {
-            char[] buf = new char[256];
-            int c;
-            while((c = reader.read(buf)) > 0)
-            {
-                if(c < 256)
-                {
-                    buf = Arrays.copyOf(buf, c);
-                }
-                System.out.print(buf);
-            } 
-        }
-        catch(IOException ex)
-		{
-            System.out.println(ex.getMessage());
-        }
-	}
-	
 	public void ResolutionFileInput (String localFileName)
 	{
 		try(FileReader reader = new FileReader(localFileName))
         {
             char[] localBufferChar = new char[256];
-            //String localBufferString = "\u0000"; // if you do that, you will get a space as a symbol!!!
-            String localBufferString = new String(); // if you do that, all will be OK!!!
+            String localBufferString = new String("");
             String localBufferStringArray [];
             int c;
             while((c = reader.read(localBufferChar)) > 0)
@@ -708,30 +683,105 @@ public class ResolutionFunction
     				}
     			}
     			
-    			ResolutionDisjunct localInputDisjunct;
-    			if (localEmpty == true)
-    			{
-    				localInputDisjunct = new ResolutionDisjunct();
-    				localInputDisjunct.SetEmpty(localEmpty);
-    			}
-    			else if (localOne == true)
-    			{
-    				localInputDisjunct = new ResolutionDisjunct();
-    				localInputDisjunct.SetOne(localOne);
-    			}
-    			else
-    			{
-    				localInputDisjunct = new ResolutionDisjunct(localInputVariables);
-    			}
+    			ResolutionDisjunct localInputDisjunct = new ResolutionDisjunct(localInputVariables);
+    			localInputDisjunct.SetEmpty(localEmpty);
+    			localInputDisjunct.SetOne(localOne);
+    			
     			disjuncts.add(localInputDisjunct);
     			this.GetOneDisjunct(i + 1);
-    			
-    			//System.out.println("New disjunct? 0 -- no, 1 -- yes:");
-
     		}
     		this.RefreshD();
     		this.SortD();
     		this.Refresh();
+    		System.out.print("\n");
+        }
+        catch(IOException ex)
+		{
+            System.out.println(ex.getMessage());
+        }
+	}
+	
+	public void ResolutionFileInputPredicate (String localFileName)
+	{
+		try(FileReader reader = new FileReader(localFileName))
+        {
+			char leftBrace = '(';
+			char rightBrace = ')';
+			
+            char[] localBufferChar = new char[256];
+            String localBufferString = new String("");
+            String localBufferStringArray [];
+            int c;
+            while((c = reader.read(localBufferChar)) > 0)
+            {
+                if(c < 256)
+                {
+                    localBufferChar = Arrays.copyOf(localBufferChar, c);
+                }
+                localBufferString = localBufferString + String.copyValueOf(localBufferChar);
+            } 
+            localBufferStringArray = localBufferString.split("\n");
+            System.out.println("Current file input:");
+            for (int i = 0; i < localBufferStringArray.length; i++)
+    		{
+    			ArrayList<ResolutionPredicate> localInputPreds = new ArrayList<ResolutionPredicate>();
+    			
+    			boolean localEmpty = false;
+    			boolean localOne = false;
+    			
+    			String localInputPredicates [] = localBufferStringArray[i].split("\\s");
+    			for (int j = 0; j < localInputPredicates.length; j++)
+    			{
+    				if (!localInputPredicates[j].equals("") && !localInputPredicates[j].contains("+") && !localInputPredicates[j].equals("□") && !localInputPredicates[j].equals("1"))
+    				{
+    					boolean localDenial = true;
+    					
+    					if (localInputPredicates[j].charAt(0) == '!')
+    					{
+    						localInputPredicates[j] = localInputPredicates[j].substring(1);
+    						localDenial = false;
+    					}
+    					
+    					int localJ = 0;
+    					String localName = "";
+    					while (localInputPredicates[j].charAt(localJ) != '(')
+    					{
+    						localName = localName.concat(String.valueOf(localInputPredicates[j].charAt(localJ)));
+    						localJ = localJ + 1;
+    					}
+    					ResolutionPredicate localPredicate = new ResolutionPredicate(localDenial, localName);
+    					
+    					if (localInputPredicates[j].indexOf(leftBrace) + 1 != localInputPredicates[j].lastIndexOf(rightBrace))
+    					{
+    						ResolutionTerm.newFunction(localInputPredicates[j].substring(localInputPredicates[j].indexOf(leftBrace) + 1, localInputPredicates[j].lastIndexOf(rightBrace)), localPredicate);
+    					}
+    					else
+    					{
+    						ResolutionTerm.newFunction("", localPredicate);
+    					}
+    					
+    					localInputPreds.add(localPredicate);
+    				}
+    				else if (localInputPredicates[j].equals("□"))
+    				{
+    					localEmpty = true;
+    				}
+    				else if (localInputPredicates[j].equals("1"))
+    				{
+    					localOne = true;
+    				}
+    			}
+    			
+    			ResolutionDisjunct localInputDisjunct = new ResolutionDisjunct(localInputPreds, 1);
+    			localInputDisjunct.SetEmpty(localEmpty);
+    			localInputDisjunct.SetOne(localOne);
+    			
+    			disjuncts.add(localInputDisjunct);
+    			this.GetOneDisjunctPredicate(i + 1);
+    		}
+    		this.RefreshDPredicate();
+    		this.SortDPredicate();
+    		this.RefreshPredicate();
     		System.out.print("\n");
         }
         catch(IOException ex)
@@ -1006,20 +1056,17 @@ public class ResolutionFunction
 		int l;
 		int c;
 		boolean repeat = true;
+		this.SortD();
+		this.RefreshD();
 		ResolutionFunction localF = new ResolutionFunction();
 		localF.GetDisjuncts().addAll(disjuncts);
 		disjuncts.removeAll(disjuncts);
-		this.RefreshD();
-		this.SortD();
-		this.Refresh();
 		while (repeat == true)
 		{
 			ResolutionFunction localFR = new ResolutionFunction();
 			int d = disjuncts.size();
-			localF.SortD(); // the order is important
 			localF.Refresh();
 			disjuncts.addAll(localF.GetDisjuncts());
-			this.SortD(); // the order is important
 			this.Refresh(); // it's only here, because at the end it doesn't work
 			for (i = 0; i < disjuncts.size() - 1; i++)
 			{
@@ -1097,6 +1144,8 @@ public class ResolutionFunction
 		int p = 0;
 		int q = 0;
 		int removeIndex = 0;
+		this.RefreshD();
+		this.SortD();
 		boolean repeat = true; // repeating indicator
 		boolean adding = false; // adding disjuncts in the end indicator
 		ResolutionFunction localF = new ResolutionFunction();
@@ -1106,9 +1155,7 @@ public class ResolutionFunction
 		{
 			ResolutionFunction localFR = new ResolutionFunction();
 			int d = disjuncts.size();
-			localF.SortD(); // the order is important
 			disjuncts.addAll(localF.GetDisjuncts());
-			this.SortD(); // the order is important
 			for (i = 0; i < disjuncts.size() - 1; i++)
 			{
 				ResolutionDisjunct localDisjunct = disjuncts.get(i);
@@ -1205,6 +1252,8 @@ public class ResolutionFunction
 		int removeIndex = 0;
 		boolean repeat = true; // repeating indicator
 		boolean adding = false; // adding disjuncts in the end indicator
+		this.RefreshD();
+		this.SortD();
 		ResolutionFunction localF = new ResolutionFunction();
 		ResolutionFunction localClassicRF = new ResolutionFunction();
 		localF.GetDisjuncts().addAll(disjuncts);
@@ -1213,12 +1262,10 @@ public class ResolutionFunction
 		{
 			ResolutionFunction localFR = new ResolutionFunction();
 			int d = disjuncts.size();
-			localF.SortD(); // the order is important
 			localF.RefreshSize();
 			localClassicRF.GetDisjuncts().addAll(localF.GetDisjuncts());
 			this.RefreshSize();
 			disjuncts.addAll(localF.GetDisjuncts());
-			this.SortD(); // the order is important
 			for (i = 0; i < disjuncts.size() - 1; i++)
 			{
 				ResolutionDisjunct localDisjunct = disjuncts.get(i);
@@ -1315,6 +1362,8 @@ public class ResolutionFunction
 		int removeIndex = 0;
 		boolean repeat = true;
 		boolean adding = false; // adding disjuncts in the end indicator
+		this.RefreshD();
+		this.SortD();
 		ResolutionFunction localF = new ResolutionFunction();
 		localF.GetDisjuncts().addAll(disjuncts);
 		disjuncts.removeAll(disjuncts);
@@ -1322,10 +1371,8 @@ public class ResolutionFunction
 		{
 			ResolutionFunction localFR = new ResolutionFunction();
 			int d = disjuncts.size();
-			localF.SortD(); // the order is important
 			localF.Refresh();
 			disjuncts.addAll(localF.GetDisjuncts());
-			this.SortD(); // the order is important
 			this.RefreshExtension(d); // it's only here, because at the end it doesn't work
 			for (i = 0; i < disjuncts.size() - 1; i++)
 			{
@@ -1395,10 +1442,8 @@ public class ResolutionFunction
 				}
 				
 				d = disjuncts.size();
-				localF.SortD(); // the order is important
 				localF.Refresh();
 				disjuncts.addAll(localF.GetDisjuncts());
-				this.SortD(); // the order is important
 				this.RefreshExtension(d); // it's only here, because at the end it doesn't work
 			}
 		}
@@ -1426,12 +1471,140 @@ public class ResolutionFunction
 		boolean repeat = true;
 		boolean adding = false; // adding disjuncts in the end indicator
 		boolean oneExist = false;
+		this.SortDPredicate();
+		this.RefreshDPredicate();
+		ResolutionFunction localF = new ResolutionFunction();
+		localF.GetDisjuncts().addAll(disjuncts);
+		disjuncts.removeAll(disjuncts);
+		while (repeat == true)
+		{
+			ResolutionFunction localFR = new ResolutionFunction();
+			int d = disjuncts.size();
+			localF.RefreshPredicate();
+			disjuncts.addAll(localF.GetDisjuncts());
+			//this.RefreshExtensionPredicateSize(d);
+			this.RefreshPredicate(); // it's only here, because at the end it doesn't work
+			for (i = 0; i < disjuncts.size() - 1; i++)
+			{
+				ResolutionDisjunct localDisjunct = disjuncts.get(i);
+				ArrayList<ResolutionPredicate> localPredicates = localDisjunct.GetPredicates();
+				if (i < d)
+				{
+					c = d;
+				}
+				else
+				{
+					c = i + 1;
+				}
+				for (j = c; j < disjuncts.size(); j++)
+				{
+					ResolutionDisjunct localDisjunctTwo = disjuncts.get(j);
+					ArrayList<ResolutionPredicate> variablesTwo = localDisjunctTwo.GetPredicates();
+					for (k = 0; k < localPredicates.size(); k++)
+					{
+						ResolutionPredicate localVariable = localPredicates.get(k);
+						for (l = 0; l < variablesTwo.size(); l++)
+						{
+							ResolutionPredicate localVariableTwo = variablesTwo.get(l);
+							
+							ResolutionPredicate localNewPredicateOne = new ResolutionPredicate(localVariable);
+							ResolutionPredicate localNewPredicateTwo = new ResolutionPredicate(localVariableTwo);
+							ResolutionDisjunct localNewDisjunctOne = new ResolutionDisjunct(localDisjunct);
+							ResolutionDisjunct localNewDisjunctTwo = new ResolutionDisjunct(localDisjunctTwo);
+							
+							boolean localStart = false;
+							if (localNewPredicateOne.preContrary(localNewPredicateTwo))
+							{
+								boolean localIndicator = true;
+								for (m = 0; m < localNewPredicateOne.GetTerms().size(); m++)
+								{
+									localIndicator = ResolutionPredicate.unification(localNewPredicateOne, localNewDisjunctOne, localNewPredicateTwo, localNewDisjunctTwo);
+									if (localIndicator == false)
+									{
+										m = localNewPredicateOne.GetTerms().size();
+									}
+								}
+								if (localIndicator == true)
+								{
+									localStart = true;
+								}
+							}
+							if (localStart == true)
+							{
+								ResolutionDisjunct localNewDisjunct = new ResolutionDisjunct();
+								
+								localNewDisjunct.GetPredicates().addAll(localNewDisjunctOne.GetPredicates());
+								ResolutionPredicate x = localNewDisjunct.GetPredicates().get(k);
+								localNewDisjunct.GetPredicates().remove(x);
+								
+								localNewDisjunct.GetPredicates().addAll(localNewDisjunctTwo.GetPredicates());
+								ResolutionPredicate y = localNewDisjunct.GetPredicates().get(localNewDisjunctOne.GetPredicates().size() - 1 + l);
+								localNewDisjunct.GetPredicates().remove(y);
+								int [] localParents = {localNewDisjunctOne.GetID(), localNewDisjunctTwo.GetID()}; // create parent's numbers array
+								localNewDisjunct.SetParents(localParents); // set parent's numbers
+								
+								localNewDisjunct.SetContrary(String.valueOf(localVariable.GetName())); // set parent's contrary variable
+								
+								localNewDisjunct.RefreshPredicate();
+								localNewDisjunct.SortPredicate();
+								
+								localFR.SetDisjuncts(localNewDisjunct);
+								
+								if (localNewDisjunct.GetEmpty() && repeat == true)
+								{
+									repeat = false;
+									adding = true;
+									removeIndex = localFR.GetDisjuncts().size() + 1;
+								}
+							}
+						}
+					}
+				}
+			}
+			if(localFR.GetDisjuncts().size() == 0)
+			{
+				repeat = false;
+			}
+			localF = localFR;
+			if (adding)
+			{
+				q = localF.GetDisjuncts().size();
+				for (p = removeIndex; p < q; p++)
+				{
+					localF.GetDisjuncts().remove(removeIndex);
+				}
+				
+				d = disjuncts.size();
+				localF.RefreshPredicate();
+				disjuncts.addAll(localF.GetDisjuncts());
+				this.RefreshPredicate();
+				//this.RefreshExtensionPredicateSize(d); // it's only here, because at the end it doesn't work
+			}
+		}
+	}
+	
+	public void ResolutionAllUniquePredicateOne ()
+	{
+		int i;
+		int j;
+		int k;
+		int m;
+		int l;
+		int c;
+		int p = 0;
+		int q = 0;
+		int removeIndex = 0;
+		boolean repeat = true;
+		boolean adding = false; // adding disjuncts in the end indicator
+		boolean oneExist = false;
+		
 		ResolutionFunction localF = new ResolutionFunction();
 		localF.GetDisjuncts().addAll(disjuncts);
 		disjuncts.removeAll(disjuncts);
 		this.RefreshDPredicate();
 		this.SortDPredicate();
 		this.RefreshPredicate();
+		
 		while (repeat == true)
 		{
 			ResolutionFunction localFR = new ResolutionFunction();
@@ -1509,7 +1682,7 @@ public class ResolutionFunction
 								
 								//System.out.print(localNewDisjunct.toOutputStringPredicate(0));
 								
-								if (oneExist == false)
+								/*if (oneExist == false)
 								{
 									localFR.SetDisjuncts(localNewDisjunct);
 									if (localNewDisjunct.GetOne() == true)
@@ -1520,7 +1693,9 @@ public class ResolutionFunction
 								else if (localNewDisjunct.GetOne() == false)
 								{
 									localFR.SetDisjuncts(localNewDisjunct);
-								}
+								}*/
+								
+								localFR.SetDisjuncts(localNewDisjunct);
 								
 								if (localNewDisjunct.GetEmpty() && repeat == true)
 								{

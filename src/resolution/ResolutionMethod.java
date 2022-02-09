@@ -1,8 +1,9 @@
 // Alternative exam -- 4 term
 // © Matthew Sobolewski and Victor Stepovik
-// Resolution method version alpha 0.24
+// Resolution method version alpha 0.25
 // Updates:
-// -- Statement logic resolution updated
+// -- FILE OUTPUT IS UNUPDATED
+// -- Some methods has been updated
 
 package resolution;
 
@@ -14,7 +15,7 @@ import java.util.HashSet;
 /**
  * Main class "ResolutionMethod"
  * @author MatmanBJ
- * @version alpha 0.24
+ * @version alpha 0.25
  */
 public class ResolutionMethod
 {
@@ -112,6 +113,7 @@ public class ResolutionMethod
 		d_func.GetFunction();
 		//d_func_return.GetFunction();
 	}
+	
 	public static void StrategiesDemonstration (ResolutionFunction localLocalRF) // resolution strategy demonstrations
 	{
 		// I STOPPED HERE
@@ -141,13 +143,17 @@ public class ResolutionMethod
 		localStrategy.ResolutionStrikeout();
 		localStrategy.GetFunction();
 	}
+	
 	public static ResolutionFunction TreatmentMain (String localString, ResolutionFunction localRF)
 	{
 		if (localString.equals("???"))
 		{
 			ResolutionFunction rfo = new ResolutionFunction(localRF);
 			ResolutionFunction rft = new ResolutionFunction(localRF);
-			rft.ResolutionAllFind();
+			rfo.ResolutionPreference();
+			//rft.ResolutionPreferenceTest();
+			rfo.GetFunction();
+			System.out.println("\n");
 			rft.GetFunction();
 		}
 		else if (localString.equals("saturation"))
@@ -184,6 +190,20 @@ public class ResolutionMethod
 		}
 		return localRF;
 	}
+	
+	public static ResolutionFunction TreatmentMainPredicate (String localString, ResolutionFunction localRF)
+	{
+		if (localString.equals("unique"))
+		{
+			localRF.ResolutionAllUniquePredicate();
+		}
+		else
+		{
+			System.out.println("Incorrect type of treatment! Nothing is done with function");
+		}
+		return localRF;
+	}
+	
 	public static ResolutionFunction InputMain (String localType)
 	{
 		ResolutionFunction cons = new ResolutionFunction ();
@@ -206,6 +226,30 @@ public class ResolutionMethod
 		}
 		return cons;
 	}
+	
+	public static ResolutionFunction InputMainPredicate (String localType)
+	{
+		ResolutionFunction cons = new ResolutionFunction ();
+		if (localType.equals("console"))
+		{
+			System.out.println("---------- CONSOLE INPUT ----------");
+			cons = new ResolutionFunction(1);
+		}
+		else if (localType.equals("file"))
+		{
+			System.out.println("---------- FILE INPUT ----------");
+			Scanner inputScanner = new Scanner(System.in);
+			System.out.println("Please write file name(<file name>):");
+			String localFS = inputScanner.nextLine();
+			cons.ResolutionFileInputPredicate(localFS);
+		}
+		else
+		{
+			System.out.println("Incorrect type of input! Default input from console");
+		}
+		return cons;
+	}
+	
 	public static void OutputMain (ResolutionFunction localOutput, String localType)
 	{
 		if (localType.equals("console"))
@@ -269,6 +313,71 @@ public class ResolutionMethod
 			System.out.println("Incorrect type of output");
 		}
 	}
+	
+	public static void OutputMainPredicate (ResolutionFunction localOutput, String localType)
+	{
+		if (localType.equals("console"))
+		{
+			System.out.println("---------- CONSOLE OUTPUT ----------");
+			localOutput.GetFunctionPredicate();
+		}
+		else if (localType.equals("file"))
+		{
+			System.out.println("---------- CHOOSED FILE OUTPUT ----------");
+			Scanner outputScanner = new Scanner(System.in);
+			System.out.println("Please write file name and specification (<file name> <specification>):");
+			String localFS = outputScanner.nextLine();
+			String localFSArray [] = localFS.split("\\s");
+			if (localFSArray[1].equals("readable"))
+			{
+				localOutput.ResolutionFileReadable("readable_" + localFSArray[0]);
+			}
+			else if (localFSArray[1].equals("unreadable"))
+			{
+				localOutput.ResolutionFileUnreadable("unreadable_" + localFSArray[0]);
+			}
+			else
+			{
+				System.out.println("Incorrect type of output");
+			}
+		}
+		else if (localType.equals("console file") || localType.equals("file console"))
+		{
+			System.out.println("---------- CONSOLE AND CHOOSED FILE OUTPUT ----------");
+			localOutput.GetFunction();
+			Scanner outputScanner = new Scanner(System.in);
+			System.out.println("Please write file name and specification (<file name> <specification>):");
+			String localFS = outputScanner.nextLine();
+			String localFSArray [] = localFS.split("\\s");
+			if (localFSArray[1].equals("readable"))
+			{
+				localOutput.ResolutionFileReadable("readable_" + localFSArray[0]);
+			}
+			else if (localFSArray[1].equals("unreadable"))
+			{
+				localOutput.ResolutionFileUnreadable("unreadable_" + localFSArray[0]);
+			}
+			else
+			{
+				System.out.println("Incorrect type of output");
+			}
+		}
+		else if (localType.equals("all"))
+		{
+			System.out.println("---------- CONSOLE AND ALL FILES OUTPUT ----------");
+			localOutput.GetFunction();
+			Scanner outputScanner = new Scanner(System.in);
+			System.out.println("Please write file name (<file name>):");
+			String localFS = outputScanner.nextLine();
+			localOutput.ResolutionFileReadable("readable_" + localFS);
+			localOutput.ResolutionFileUnreadable("unreadable_" + localFS);
+		}
+		else
+		{
+			System.out.println("Incorrect type of output");
+		}
+	}
+	
 	public static void main(String[] args)
 	{
 		Scanner inputScanner = new Scanner(System.in);
@@ -303,9 +412,12 @@ public class ResolutionMethod
 			}
 			else if (typeLogic.equals("predicate"))
 			{
-				ResolutionFunction test = new ResolutionFunction(111);
-				test.ResolutionAllUniquePredicate();
-				test.GetFunctionPredicate();
+				localFunction = InputMainPredicate("console");
+				localFunction = TreatmentMainPredicate("unique", localFunction);
+				OutputMainPredicate(localFunction, "console");
+				//localFunction = InputMainPredicate(typeInput);
+				//localFunction = TreatmentMainPredicate(typeTreatment, localFunction);
+				//OutputMainPredicate(localFunction, typeOutput);
 			}
 			else
 			{
