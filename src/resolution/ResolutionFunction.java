@@ -14,7 +14,7 @@ import java.lang.Object.*;
  * By default, it is commonly prepared for the resolution.
  * A function contains a list with disjuncts.
  * @author MatmanBJ
- * @version alpha 0.28
+ * @version alpha 0.29
  */
 public class ResolutionFunction
 {
@@ -602,6 +602,9 @@ public class ResolutionFunction
 		System.out.println(localDisjunct.toString());
 	}
 	
+	/**
+	 * This method output predicate disjunct in console, while you input your function from console or file.
+	 */
 	public void GetOneDisjunctPredicate (int localI) // for console-constructor
 	{
 		ResolutionDisjunct localDisjunct = disjuncts.get(disjuncts.size() - 1);
@@ -635,6 +638,9 @@ public class ResolutionFunction
 		}
 	}
 	
+	/**
+	 * This method input statement function from file.
+	 */
 	public void ResolutionFileInput (String localFileName)
 	{
 		try(FileReader reader = new FileReader(localFileName))
@@ -701,6 +707,9 @@ public class ResolutionFunction
         }
 	}
 	
+	/**
+	 * This method input predicate function from file.
+	 */
 	public void ResolutionFileInputPredicate (String localFileName)
 	{
 		try(FileReader reader = new FileReader(localFileName))
@@ -790,22 +799,17 @@ public class ResolutionFunction
         }
 	}
 	
+	/**
+	 * This method output statement function in readable file.
+	 */
 	public void ResolutionFileReadable (String localFileName)
 	{
 		try (FileWriter writer = new FileWriter(localFileName, false))
         {
 			int i = 1;
-			String localOut [] = new String[this.GetDisjuncts().size()];
 			for (ResolutionDisjunct localDisjunct : disjuncts)
 			{
-				ArrayList<ResolutionVariable> variables = localDisjunct.GetVariables();
-				localOut[i - 1] = localDisjunct.toReadableString();
-				i = i + 1;
-			}
-			i = 1;
-			for (ResolutionDisjunct localDisjunct : disjuncts)
-			{
-				String localString = localOut[i - 1];
+				String localString = localDisjunct.toReadableString();
 				writer.write(localString);
 				writer.append('\n');
 				i = i + 1;
@@ -818,22 +822,17 @@ public class ResolutionFunction
         }
 	}
 	
+	/**
+	 * This method output statement function in unreadable file.
+	 */
 	public void ResolutionFileUnreadable (String localFileName)
 	{
 		try (FileWriter writer = new FileWriter(localFileName, false))
         {
 			int i = 1;
-			String localOut [] = new String[this.GetDisjuncts().size()];
 			for (ResolutionDisjunct localDisjunct : disjuncts)
 			{
-				ArrayList<ResolutionVariable> variables = localDisjunct.GetVariables();
-				localOut[i - 1] = localDisjunct.toOutputString(i);
-				i = i + 1;
-			}
-			i = 1;
-			for (ResolutionDisjunct localDisjunct : disjuncts)
-			{
-				String localString = localOut[i - 1];
+				String localString = localDisjunct.toOutputString(i);
 				writer.write(localString);
 				i = i + 1;
 			}
@@ -844,6 +843,57 @@ public class ResolutionFunction
             System.out.println(localException.getMessage());
         }
 	}
+	
+	/**
+	 * This method output predicate function in readable file.
+	 */
+	public void ResolutionFileReadablePredicate (String localFileName)
+	{
+		try (FileWriter writer = new FileWriter(localFileName, false))
+        {
+			int i = 1;
+			for (ResolutionDisjunct localDisjunct : disjuncts)
+			{
+				String localString = localDisjunct.toReadableStringPredicate();
+				writer.write(localString);
+				writer.append('\n');
+				i = i + 1;
+			}
+            writer.flush();
+        }
+        catch(IOException localException)
+		{
+            System.out.println(localException.getMessage());
+        }
+	}
+	
+	/**
+	 * This method output predicate function in unreadable file.
+	 */
+	public void ResolutionFileUnreadablePredicate (String localFileName)
+	{
+		try (FileWriter writer = new FileWriter(localFileName, false))
+        {
+			int i = 1;
+			for (ResolutionDisjunct localDisjunct : disjuncts)
+			{
+				String localString = localDisjunct.toOutputStringPredicate(i);
+				writer.write(localString);
+				i = i + 1;
+			}
+            writer.flush();
+        }
+        catch(IOException localException)
+		{
+            System.out.println(localException.getMessage());
+        }
+	}
+	
+	// --------------------------------------------------
+	// ---------- STATEMENT RESOLUTION METHODS ----------
+	// --------------------------------------------------
+	
+	// ---------- [OUR] ALL STRATEGY ----------
 	
 	/**
 	 * [DEMONSTRATION]
@@ -925,6 +975,98 @@ public class ResolutionFunction
 		}
 		return localF;
 	}
+	
+	// ---------- [OUR] ALL NUMBER STRATEGY ----------
+	
+	/**
+	 * [DEMONSTRATION]
+	 * Parameter for console: "all number".
+	 * This method makes all possible disjuncts for number of iterations.
+	 * Then it stops, when given number of iterations will be passed.
+	 * It only works for number, not for finding an empty disjunct!
+	 * @author MatmanBJ
+	 */
+	public ResolutionFunction ResolutionAllNumber (int localIterations)
+	{
+		int m;
+		int i;
+		int j;
+		int k;
+		int l;
+		int c;
+		ResolutionFunction localF = new ResolutionFunction();
+		localF.GetDisjuncts().addAll(disjuncts);
+		disjuncts.removeAll(disjuncts);
+		for (m = 0; m <= localIterations; m++) // "m <= localIterations" is for last iteration for adding disjuncts!!! (last +1 iteration's disjuncts won't be added)
+		{
+			ResolutionFunction localFR = new ResolutionFunction();
+			
+			System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
+			System.out.format("|%-120s|\n", "ITERATION " + m);
+			System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
+			for (i = 0; i < localF.GetDisjuncts().size(); i++)
+			{
+				System.out.format("|%-120s|\n", localF.GetDisjuncts().get(i).toOutputStringOnly(i + 1));
+			}
+			//localF.GetFunction();
+			System.out.println("+------------------------------------------------------------------------------------------------------------------------+");
+			
+			int d = disjuncts.size();
+			disjuncts.addAll(localF.GetDisjuncts());
+			for (i = 0; i < disjuncts.size() - 1; i++)
+			{
+				ResolutionDisjunct localDisjunct = disjuncts.get(i);
+				ArrayList<ResolutionVariable> variables = localDisjunct.GetVariables();
+				if (i < d)
+				{
+					c = d;
+				}
+				else
+				{
+					c = i + 1;
+				}
+				for (j = c; j < disjuncts.size(); j++)
+				{
+					ResolutionDisjunct localDisjunctTwo = disjuncts.get(j);
+					ArrayList<ResolutionVariable> variablesTwo = localDisjunctTwo.GetVariables();
+					for (k = 0; k < variables.size(); k++)
+					{
+						ResolutionVariable localVariable = variables.get(k);
+						for (l = 0; l < variablesTwo.size(); l++)
+						{
+							ResolutionVariable localVariableTwo = variablesTwo.get(l);
+							if ((localVariable.GetName().equals(localVariableTwo.GetName())) && (localVariable.GetDenial() != localVariableTwo.GetDenial()))
+							{
+								ResolutionDisjunct localNewDisjunct = new ResolutionDisjunct();
+								
+								localNewDisjunct.GetVariables().addAll(localDisjunct.GetVariables());
+								ResolutionVariable x = localNewDisjunct.GetVariables().get(k);
+								localNewDisjunct.GetVariables().remove(x);
+								
+								localNewDisjunct.GetVariables().addAll(localDisjunctTwo.GetVariables());
+								ResolutionVariable y = localNewDisjunct.GetVariables().get(localDisjunct.GetVariables().size() - 1 + l);
+								localNewDisjunct.GetVariables().remove(y);
+								int [] localParents = {localDisjunct.GetID(), localDisjunctTwo.GetID()};
+								localNewDisjunct.SetParents(localParents);
+								
+								localNewDisjunct.SetContrary(String.valueOf(localVariable.GetName()));
+								
+								localNewDisjunct.Refresh();
+								localNewDisjunct.Sort();
+								
+								localFR.SetDisjuncts(localNewDisjunct);
+							}
+						}
+					}
+				}
+			}
+			localF = localFR;
+		}
+		System.out.print("\n");
+		return localF;
+	}
+	
+	// ---------- [OUR] ALL FIND STRATEGY ----------
 	
 	/**
 	 * [DEMONSTRATION]
@@ -1033,15 +1175,25 @@ public class ResolutionFunction
 		}
 	}
 	
-	// ----------------------------------------
-	// ---------- RESOLUTION METHODS ----------
-	// ----------------------------------------
-	
-	// ---------- A GIANT OF THOUHT, A FATHER OF RUSSIAN RES(V)OLUTION ----------
+	// ---------- SECOND INDIVIDUAL HOMEWORK ("IHW" or Russian "IDZ") RESOLUTION ----------
 	
 	/**
 	 * [DEMONSTRATION]
-	 * Parameter for console: "unique".
+	 * Parameter for console: "idz".
+	 * This method is solving YOUR SECOND IDZ!
+	 * It makes all possible disjuncts for the first iteration (as in the task).
+	 * @author MatmanBJ
+	 */
+	public ResolutionFunction ResolutionIDZ ()
+	{
+		return ResolutionAllNumber (1);
+	}
+	
+	// ---------- [OUR] ALL UNIQUE STRATEGY ----------
+	
+	/**
+	 * [DEMONSTRATION]
+	 * Parameter for console: "all unique".
 	 * This method makes all possible, but unique disjuncts
 	 * (first gotten disjunct is new unique, other will be deleted).
 	 * I guess it's a remake of the famous "ResolutionHash" (absolutely LEGENDARY function)!
@@ -1449,42 +1601,16 @@ public class ResolutionFunction
 		}
 	}
 	
-	// ---------- A GIANT OF THOUHT, A FATHER OF RUSSIAN RES(V)OLUTION ----------
-	
-	class Interpretation
-	{
-		private String name;
-		private boolean denial;
-		
-		Interpretation ()
-		{}
-		
-		Interpretation (String localName)
-		{
-			name = new String(localName);
-			denial = false;
-		}
-		
-		public void SetName (String localName)
-		{
-			name = new String(localName);
-		}
-		public void SetDenial (boolean localDenial)
-		{
-			denial = localDenial;
-		}
-		public String GetName ()
-		{
-			return name;
-		}
-		public boolean GetDenial ()
-		{
-			return denial;
-		}
-	}
+	// ---------- SEMANTIC METHOD ----------
 	
 	/**
-	 * [DEMONSTRATION]
+	 * Parameter for console: "semantic".
+	 * This method makes the semantic resolution for the input disjunct.
+	 * You have to input the "interpretation" -- a set of terms (variables), that are true.
+	 * So, each iteration program divides new set of disjuncts by its interpretation,
+	 * and it makes new ones only by getting them from different sets ("TRUE" set and "FALSE" set).
+	 * It doesn't matter which interpretation you use -- this method is full,
+	 * so an empty disjunct exist, it will be found!
 	 * @author MatmanBJ
 	 */
 	public void ResolutionSemantic ()
@@ -1519,7 +1645,7 @@ public class ResolutionFunction
 		disjuncts.removeAll(disjuncts);
 		System.out.println("+---------------------------------------+---------------------------------------+");
 		System.out.format("|%-39s|%-39s|", "TRUE INTERPRETATION", "FALSE INTERPRETATION");
-		System.out.print("\n+---------------------------------------+---------------------------------------+");
+		System.out.println("\n+---------------------------------------+---------------------------------------+");
 		
 		while (repeat == true)
 		{
@@ -1527,9 +1653,9 @@ public class ResolutionFunction
 			localF.Refresh();
 			
 			iter = iter + 1;
-			System.out.println("\n+---------------------------------------+---------------------------------------+");
-			System.out.format("|%-79s|", "ITERATION " + iter);
-			System.out.println("\n+---------------------------------------+---------------------------------------+");
+			System.out.println("+---------------------------------------+---------------------------------------+");
+			System.out.format("|%-79s|\n", "ITERATION " + iter);
+			System.out.println("+---------------------------------------+---------------------------------------+");
 			
 			for (i = 0; i < localF.GetDisjuncts().size(); i++)
 			{
@@ -1596,10 +1722,6 @@ public class ResolutionFunction
 					System.out.print("\n");
 				}
 			}
-			//System.out.println("TRUE");
-			//localTrue.GetFunction();
-			//System.out.println("FALSE");
-			//localFalse.GetFunction();
 			for (i = 0; i < localTrue.GetDisjuncts().size(); i++)
 			{
 				ResolutionDisjunct localDisjunct = localTrue.GetDisjuncts().get(i);
@@ -1691,9 +1813,9 @@ public class ResolutionFunction
 		System.out.print("\n");
 	}
 	
-	// --------------------------------
-	// ---------- PREDICATES ----------
-	// --------------------------------
+	// --------------------------------------------------
+	// ---------- PREDICATE RESOLUTION METHODS ----------
+	// --------------------------------------------------
 	
 	/**
 	 * ???
